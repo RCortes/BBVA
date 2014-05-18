@@ -1,0 +1,50 @@
+\\psf\home\documents\visual studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.dll
+\\psf\home\documents\visual studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.pdb
+\\psf\home\documents\visual studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.dll
+\\psf\home\documents\visual studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.pdb
+\\psf\home\documents\visual studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\obj\Debug\WCF_PushBBVA.dll
+\\psf\home\documents\visual studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\obj\Debug\WCF_PushBBVA.pdb
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.pdb
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.pdb
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.pdb
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\obj\Debug\ResolveAssemblyReference.cache
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\obj\Debug\WCF_PushBBVA.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\obj\Debug\WCF_PushBBVA.pdb
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\Mono.Security.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\Npgsql.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\Npgsql.pdb
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\Npgsql.xml
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\de\Npgsql.resources.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\es\Npgsql.resources.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\fi\Npgsql.resources.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\fr\Npgsql.resources.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\ja\Npgsql.resources.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\zh-CN\Npgsql.resources.dll
+\\psf\Home\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\obj\Debug\WCF_PushBBVA.csprojResolveAssemblyReference.cache
+\\psf\Home\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.pdb
+\\psf\Home\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.dll
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.dll
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.pdb
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.dll
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.dll
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.pdb
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.pdb
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\obj\Debug\WCF_PushBBVA.csprojResolveAssemblyReference.cache
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\obj\Debug\WCF_PushBBVA.dll
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\obj\Debug\WCF_PushBBVA.pdb
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.pdb
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.pdb
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.pdb
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\obj\Debug\WCF_PushBBVA.csprojResolveAssemblyReference.cache
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\obj\Debug\WCF_PushBBVA.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\obj\Debug\WCF_PushBBVA.pdb
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Core.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Apple.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Android.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\Newtonsoft.Json.dll

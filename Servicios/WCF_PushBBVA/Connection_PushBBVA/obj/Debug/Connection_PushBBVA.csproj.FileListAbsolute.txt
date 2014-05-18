@@ -1,0 +1,39 @@
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Connection_PushBBVA.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Connection_PushBBVA.pdb
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Data_PushBBVA.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Data_PushBBVA.pdb
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Npgsql.pdb
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Npgsql.xml
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\de\Npgsql.resources.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\es\Npgsql.resources.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\fi\Npgsql.resources.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\fr\Npgsql.resources.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\ja\Npgsql.resources.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\zh-CN\Npgsql.resources.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\ResolveAssemblyReference.cache
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\Connection_PushBBVA.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\Connection_PushBBVA.pdb
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Mono.Security.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Npgsql.dll
+\\psf\Home\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Connection_PushBBVA.dll
+\\psf\Home\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Connection_PushBBVA.pdb
+\\psf\Home\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Data_PushBBVA.dll
+\\psf\Home\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Data_PushBBVA.pdb
+\\psf\Home\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\Connection_PushBBVA.dll
+\\psf\Home\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\Connection_PushBBVA.pdb
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Connection_PushBBVA.dll
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Connection_PushBBVA.pdb
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Data_PushBBVA.dll
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Data_PushBBVA.pdb
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\Connection_PushBBVA.dll
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\Connection_PushBBVA.pdb
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\Connection_PushBBVA.csprojResolveAssemblyReference.cache
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Connection_PushBBVA.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Connection_PushBBVA.pdb
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Data_PushBBVA.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Data_PushBBVA.pdb
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\Connection_PushBBVA.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\Connection_PushBBVA.pdb
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\PushSharp.Android.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\PushSharp.Apple.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\PushSharp.Core.dll
