@@ -21,14 +21,14 @@ namespace WCF_PushBBVA
         [WebInvoke(Method = "GET",
             ResponseFormat = WebMessageFormat.Xml,
             BodyStyle = WebMessageBodyStyle.WrappedRequest,
-            UriTemplate = "Create/{rut},{firstName},{lastName},{idDevice},{idPlataform}")]
+            UriTemplate = "CreateUser/{rut},{firstName},{lastName},{idDevice},{idPlataform}")]
         Status Create(string rut, string firstName, string lastName, string idDevice, string idPlataform);
 
         [OperationContract]
         [WebInvoke(Method = "GET",
             ResponseFormat = WebMessageFormat.Xml,
             BodyStyle = WebMessageBodyStyle.WrappedRequest,
-            UriTemplate = "Delete/{rut}")]
+            UriTemplate = "DeactivateUser/{rut}")]
         Status Delete(string rut);
 
         [OperationContract]
@@ -64,12 +64,24 @@ namespace WCF_PushBBVA
         [WebInvoke(Method = "GET",
             ResponseFormat = WebMessageFormat.Xml,
             BodyStyle = WebMessageBodyStyle.WrappedRequest,
-            UriTemplate = "Send/{rut},{idNotificationType},{shortText},{longText}")]
+            UriTemplate = "sendNotification/{rut},{idNotificationType},{shortText},{longText}")]
         Status sendNotification(string rut, string idNotificationType, string shortText, string longText);
 
 
+          [OperationContract]
+        [WebInvoke(Method = "GET",
+            ResponseFormat = WebMessageFormat.Xml,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest,
+            UriTemplate = "changeSchedule/{update},{idNotificationType}")]
+         Status changeSchedule(string update, string idNotificationType);
 
-
+        
+          [OperationContract]
+        [WebInvoke(Method = "GET",
+            ResponseFormat = WebMessageFormat.Xml,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest,
+            UriTemplate = "readNotification/{idHistorical}")]
+         Status readNotification(string idHistorical);
 
         ////////////// ANTIGUOS /////////////////////
 

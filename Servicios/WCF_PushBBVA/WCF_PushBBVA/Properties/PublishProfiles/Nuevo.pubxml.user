@@ -11,10 +11,10 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
   </PropertyGroup>
   <ItemGroup>
     <File Include="bin/Connection_PushBBVA.dll">
-      <publishTime>05/18/2014 03:03:07</publishTime>
+      <publishTime>05/18/2014 21:57:10</publishTime>
     </File>
     <File Include="bin/Data_PushBBVA.dll">
-      <publishTime>05/18/2014 00:45:04</publishTime>
+      <publishTime>05/18/2014 21:27:09</publishTime>
     </File>
     <File Include="bin/Mono.Security.dll">
       <publishTime>05/03/2013 11:17:54</publishTime>
@@ -35,13 +35,13 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
       <publishTime>04/27/2014 17:26:42</publishTime>
     </File>
     <File Include="bin/WCF_PushBBVA.dll">
-      <publishTime>05/18/2014 03:03:21</publishTime>
+      <publishTime>05/18/2014 21:57:24</publishTime>
     </File>
     <File Include="Service1.svc">
       <publishTime>04/18/2014 22:57:13</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>05/18/2014 03:03:27</publishTime>
+      <publishTime>05/18/2014 21:57:24</publishTime>
     </File>
   </ItemGroup>
 </Project>

@@ -18,8 +18,8 @@ namespace Connection_PushBBVA
     public class SQLConnection
     {
 
-        public static string conex = "Data Source=RODOLFOCORT6393;Initial Catalog=Notificaciones;Persist Security Info=True;User ID=sa;Password=q1w2e3";
-        //public static string conex = "Data Source=WINDOWS7-32BITS;Initial Catalog=PushNotification;Persist Security Info=True;User ID=sa;Password=12345";
+        //public static string conex = "Data Source=RODOLFOCORT6393;Initial Catalog=Notificaciones;Persist Security Info=True;User ID=sa;Password=q1w2e3";
+        public static string conex = "Data Source=WINDOWS7-32BITS;Initial Catalog=PushNotification;Persist Security Info=True;User ID=sa;Password=12345";
 
         public static Status CreateUser(string rut, string firstName, string lastName, string idDevice, string idPlataform)
         {          
@@ -706,6 +706,74 @@ namespace Connection_PushBBVA
         
         }
 
+        public static Status changeSchedule(string update, string idNotificationType)
+        {
+            Status status = new Status();
+            string text = base64ToText(update);
+            DateTime time = Convert.ToDateTime(text);
+            try
+            {
+
+                string selectNotificationtype = @"UPDATE dbo.NotificationType SET start = @update WHERE idNotificationType = @idNotificationType";
+
+                SqlConnection conn = new SqlConnection(connectionString: conex);
+                SqlCommand command = new SqlCommand(selectNotificationtype, conn);
+                command.Parameters.AddWithValue("@idNotificationType", idNotificationType);
+                command.Parameters.AddWithValue("@update", text);
+             
+                conn.Open();
+                command.ExecuteScalar();
+                conn.Close();
+             
+             
+             
+                status.status = "Success";
+                status.description = "Update Setting";
+
+            }
+            catch (Exception ex)
+            {
+                status.status = "Error";
+                status.description = ex.Message;
+            }
+            return status;
+
+
+        }
+
+        public static Status readNotification(string idHistorical)
+        {
+            Status status = new Status();
+            try
+            {
+
+                string updateHistorical = @"UPDATE dbo.Historical SET status = @status WHERE idHistorical = @idHistorical";
+
+                SqlConnection conn = new SqlConnection(connectionString: conex);
+                SqlCommand command = new SqlCommand(updateHistorical, conn);
+                command.Parameters.AddWithValue("@status", 1);
+                command.Parameters.AddWithValue("@idHistorical", idHistorical);
+
+                conn.Open();
+                command.ExecuteScalar();
+                conn.Close();
+
+
+
+                status.status = "Success";
+                status.description = "Update Setting";
+
+            }
+            catch (Exception ex)
+            {
+                status.status = "Error";
+                status.description = ex.Message;
+            }
+            return status;
+
+
+        }
+
         public static Status<List<NotificationType>> ListSetting(string rut)
         {
             Status<List<NotificationType>> status = new Status<List<NotificationType>>();
@@ -713,7 +781,7 @@ namespace Connection_PushBBVA
             try
             {
 
-                string selectNotificationType = @"SELECT NT.idNotificationType, Nt.title, NTU.status FROM dbo.NotificationType_Users NTU, dbo.NotificationType NT WHERE NT.idnotificationType = NTU.idNotificationType AND  NTU.idUsers = @idUsers";
+                string selectNotificationType = @"SELECT NT.idNotificationType, Nt.title, NTU.status, NT.start FROM dbo.NotificationType_Users NTU, dbo.NotificationType NT WHERE NT.idnotificationType = NTU.idNotificationType AND  NTU.idUsers = @idUsers";
 
 
                 SqlConnection conn = new SqlConnection(connectionString: conex);
@@ -739,6 +807,7 @@ namespace Connection_PushBBVA
                     Type.idNotificationType = int.Parse(_dr[0].ToString());
                     Type.title = _dr[1].ToString();
                     Type.status = _dr[2].ToString();
+                    Type.start = _dr[3].ToString();
 
                     status.Data.Add(Type);
                 }
@@ -757,7 +826,7 @@ namespace Connection_PushBBVA
         
         }
 
-       static void Historical(string idNotificationType, string idUsers, string idDevice, string idPlataform, string shortText, string longText)
+        static void Historical(string idNotificationType, string idUsers, string idDevice, string idPlataform, string shortText, string longText)
         {
             try
             {
@@ -824,16 +893,20 @@ namespace Connection_PushBBVA
 
                 conn.Close();
 
+                status.status = "Error";
+                status.description = "unregistered user";
+
                 foreach (DataRow _dr in dtDatos.Tables[0].Rows)
                 {
-                    string text = shortText;
+                   string text = base64ToText(shortText);
+                   //var text = Convert.FromBase64String(shortText);
                     if (_dr[1].ToString() == "2")
                     {
                         var appleCert = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Certificados.p12"));
                         push.RegisterAppleService(new ApplePushChannelSettings(false, appleCert, "q1w2e3r4"));
                         push.QueueNotification(new AppleNotification()
                                                    .ForDeviceToken(_dr[0].ToString())
-                                                   .WithAlert(text)
+                                                   .WithAlert(text.ToString())
                                                    .WithBadge(-1)
                                                    .WithSound("sound.caf"));
                         push.StopAllServices();
@@ -933,24 +1006,19 @@ namespace Connection_PushBBVA
             Console.WriteLine("Channel Created for: " + sender);
         }
 
-        public static string Base64_Encode(string str)
+        static string textToBase64(string sAscii)
         {
-            byte[] encbuff = System.Text.Encoding.UTF8.GetBytes(str);
-            return Convert.ToBase64String(encbuff);
+            System.Text.ASCIIEncoding encoding = new System.Text.ASCIIEncoding();
+            byte[] bytes = encoding.GetBytes(sAscii);
+            return System.Convert.ToBase64String(bytes, 0, bytes.Length);
         }
 
-        public static string Base64_Decode(string str)
+        static string base64ToText(string sbase64)
         {
-            try
-            {
-                byte[] decbuff = Convert.FromBase64String(str);
-                return System.Text.Encoding.UTF8.GetString(decbuff);
-            }
-            catch(Exception ex)
-            {
-                { return ""; }
-            }
-        }
+            byte[] bytes = System.Convert.FromBase64String(sbase64);
+            System.Text.ASCIIEncoding encoding = new System.Text.ASCIIEncoding();
+            return encoding.GetString(bytes, 0, bytes.Length);
+        } 
         
         ///////// ANTIGUOS ///////////////
 

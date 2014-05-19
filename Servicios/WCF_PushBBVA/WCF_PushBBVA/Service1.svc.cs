@@ -56,6 +56,20 @@ namespace WCF_PushBBVA
         }
 
 
+        public Status changeSchedule(string update, string idNotificationType)
+        {
+            Status status = SQLConnection.changeSchedule(update, idNotificationType);
+            return status;
+        }
+
+        public Status readNotification(string idHistorical)
+        {
+            Status status = SQLConnection.readNotification(idHistorical);
+            return status;
+        }
+        
+
+
 
 
         ////////// ANTIGUOS //////////////////////////////////////

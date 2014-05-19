@@ -1,0 +1,4 @@
+Z:\Github\BBVA\Console\ReadNotifications\ReadNotifications\bin\Debug\ReadNotifications.exe
+Z:\Github\BBVA\Console\ReadNotifications\ReadNotifications\bin\Debug\ReadNotifications.pdb
+Z:\Github\BBVA\Console\ReadNotifications\ReadNotifications\obj\Debug\ReadNotifications.exe
+Z:\Github\BBVA\Console\ReadNotifications\ReadNotifications\obj\Debug\ReadNotifications.pdb

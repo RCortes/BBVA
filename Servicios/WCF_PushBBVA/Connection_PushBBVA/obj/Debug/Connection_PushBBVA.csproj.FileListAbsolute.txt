@@ -37,3 +37,10 @@ Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Connect
 Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\PushSharp.Android.dll
 Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\PushSharp.Apple.dll
 Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\PushSharp.Core.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Connection_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Connection_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Data_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Data_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\Connection_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\Connection_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\Connection_PushBBVA.csprojResolveAssemblyReference.cache

@@ -15,3 +15,7 @@ Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Data_Pu
 Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Data_PushBBVA\bin\Debug\Data_PushBBVA.pdb
 Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Data_PushBBVA\obj\Debug\Data_PushBBVA.dll
 Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Data_PushBBVA\obj\Debug\Data_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Data_PushBBVA\bin\Debug\Data_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Data_PushBBVA\bin\Debug\Data_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Data_PushBBVA\obj\Debug\Data_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Data_PushBBVA\obj\Debug\Data_PushBBVA.pdb

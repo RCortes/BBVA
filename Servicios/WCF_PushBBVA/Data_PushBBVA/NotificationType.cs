@@ -27,5 +27,12 @@ namespace Data_PushBBVA
             get { return _title; }
             set { _title = value; }
         }
+
+        private string _start;
+        public string start
+        {
+            get { return _start; }
+            set { _start = value; }
+        }
     }
 }
