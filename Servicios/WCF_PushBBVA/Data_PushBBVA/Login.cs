@@ -7,13 +7,6 @@ namespace Data_PushBBVA
 {
     public class Login
     {
-        public string _status;
-
-        public string status 
-        {
-            get { return _status; }
-            set { _status = value; }
-        }
 
         private string _user;
 

@@ -43,4 +43,3 @@ Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Data_PushBBV
 Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Debug\Data_PushBBVA.pdb
 Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\Connection_PushBBVA.dll
 Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\Connection_PushBBVA.pdb
-Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\obj\Debug\Connection_PushBBVA.csprojResolveAssemblyReference.cache

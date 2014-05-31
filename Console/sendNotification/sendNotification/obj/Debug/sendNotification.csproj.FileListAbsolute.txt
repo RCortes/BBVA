@@ -1,0 +1,14 @@
+Z:\Github\BBVA\Console\sendNotification\sendNotification\obj\Debug\sendNotification.csprojResolveAssemblyReference.cache
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Debug\sendNotification.exe
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Debug\sendNotification.pdb
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Debug\PushSharp.Android.dll
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Debug\PushSharp.Apple.dll
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Debug\PushSharp.Core.dll
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Debug\Newtonsoft.Json.dll
+Z:\Github\BBVA\Console\sendNotification\sendNotification\obj\Debug\sendNotification.exe
+Z:\Github\BBVA\Console\sendNotification\sendNotification\obj\Debug\sendNotification.pdb
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Debug\PushSharp.Android.pdb
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Debug\PushSharp.Apple.pdb
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Debug\PushSharp.Core.pdb
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Debug\Newtonsoft.Json.xml
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Debug\sendNotification.exe.config

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+	<head>
+
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+
+	</head>
+
+	<body>
+
+		<header>	<!-- Header -->
+
+			<article class="head">
+				
+				<section class="titulo">
+					<h2>Administrador</h2>
+					<h1>Notificaciones PUSH</h1>
+				</section>
+
+				<section class="login">
+					Bienvenido, <!-- Insertar login acá, reemplazando "nombreUsuario" --> nombreUsuario <a href="index.html">Salir</a><!-- También dummy url. -->
+				</section>
+
+			</article>
+
+			<article class="menu"> <!-- href="" fijos, que se deben cambiar en la versión final. Sólo son de muestra. -->
+
+				<section class="btmenu">					
+					<a href="mensajes_enviados.html"><div data-icon="b"></div>Mensajes enviados</a>
+				</section>
+				
+				<section class="btmenu">
+					<a href="desubscribir.html"><div data-icon="c"></div>Desuscribir mensajes</a>
+				</section>
+
+				<section class="btmenu">
+					<a href="subir_excel.html"><div data-icon="a"></div>Subir Excel</a>
+				</section>
+
+				<section class="btmenu">
+					<a href="informes.html"><div data-icon="d"></div>Descargar informes</a>
+				</section>
+
+				<section class="btmenu">
+					<a href="configurar.html"><div data-icon="e"></div>Configurar mensajes</a>
+				</section>
+
+			</article>
+
+		</header>
+
+		<section class="content"><!-- Content -->
+
+			<section class="bloque">
+
+				<h1>Mensajes enviados</h1>
+				
+				<form class="buscar"> <!-- Buscador para filtrar por RUT -->
+
+					<input type="text" name="Buscar" class="searchtxt" value="Ingresar RUT">
+					<button type="submit" class="searchbt">Buscar</button>
+
+				</form>
+				
+				<div class="resultados">
+
+					<div class="col">
+						<li>Mensaje</li>
+						<li>Fecha</li>
+						<li>Cantidad</li>
+						<li>Enviado por</li>
+					</div>
+
+					<div class="coltext">
+						<li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam suscipit arcu elit, id ullamcorper nunc malesuada a.</li> <!-- Mensaje -->
+						<li>17/04/2014</li> <!-- Fecha -->
+						<li>150</li> <!-- Cantidad -->
+						<li>nombreUsuario</li> <!-- Enviado por -->
+					</div>
+
+					<!-- Las que siguen sólo con un ejemplo de cómo deberían verse los resultados en forma de fila. La idea es que sólo quede la primera clase "coltext" y todos los resultados sean variables, dependiendo de la búsqueda. -->
+
+					<div class="coltext">
+						<li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam suscipit arcu elit, id ullamcorper nunc malesuada a.</li> 
+						<li>17/04/2014</li> 
+						<li>150</li>
+						<li>nombreUsuario</li> 
+					</div>
+
+					<div class="coltext">
+						<li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam suscipit arcu elit, id ullamcorper nunc malesuada a.</li> 
+						<li>17/04/2014</li> 
+						<li>150</li>
+						<li>nombreUsuario</li> 
+					</div>
+
+					<div class="coltext">
+						<li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam suscipit arcu elit, id ullamcorper nunc malesuada a.</li> 
+						<li>17/04/2014</li> 
+						<li>150</li>
+						<li>nombreUsuario</li> 
+					</div>
+
+					<!-- Fin de ejemplo. -->
+
+					<!-- Pagination. Sé que no será la paginación final, pero lo importante acá es respetar el diseño. -->
+
+					<div class="pagination">
+						<li><a href="">&laquo;</a></li>
+						<li><a href="" class="pgselected">1</a></li>
+						<li><a href="">2</a></li>
+						<li><a href="">3</a></li>
+						<li><a href="">4</a></li>
+						<li><a href="">5</a></li>
+						<li><a href="">&raquo;</a></li>
+					</div>
+
+				</div>
+
+			</section>
+
+		</section>
+
+		<footer class="footer"><!-- Footer -->
+
+			<p>Todos los derechos reservados &#8211; <a href="http://www.movidreams.com">movidreams.com</a></p>
+
+		</footer>
+
+	</body>	
+
+
+</html>

@@ -34,5 +34,12 @@ namespace Data_PushBBVA
             get { return _start; }
             set { _start = value; }
         }
+
+        private int _duration;
+        public int duration
+        {
+            get { return _duration; }
+            set { _duration = value; }
+        }
     }
 }

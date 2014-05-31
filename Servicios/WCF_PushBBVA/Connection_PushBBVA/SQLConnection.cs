@@ -12,26 +12,76 @@ using PushSharp.Apple;
 using PushSharp.Android;
 using PushSharp.Core;
 using System.IO;
+using System.Data.OleDb;
+using System.Net;
+
 
 namespace Connection_PushBBVA
 {
     public class SQLConnection
     {
+        public static string conex = ConfigurationManager.ConnectionStrings["DB"].ConnectionString;
 
-        //public static string conex = "Data Source=RODOLFOCORT6393;Initial Catalog=Notificaciones;Persist Security Info=True;User ID=sa;Password=q1w2e3";
-        public static string conex = "Data Source=WINDOWS7-32BITS;Initial Catalog=PushNotification;Persist Security Info=True;User ID=sa;Password=12345";
+        public static Status<Login> Login(string user, string pass)
+        { 
+            Status<Login> status = new Status<Login>();
+            try{
+               string sql = @"SELECT *
+                               FROM Admin
+                               WHERE idAdmin = @usuario AND pass = @password ";
+
+          
+            
+               
+                SqlConnection conn = new SqlConnection(connectionString: conex);
+                conn.Open();
+
+                user = removeRut(user);
+
+                SqlCommand command = new SqlCommand(sql, conn);
+                command.Parameters.AddWithValue("@usuario", user);
+                command.Parameters.AddWithValue("@password", pass);
+
+                SqlDataAdapter daAdaptador = new SqlDataAdapter(command);
+                DataSet dtDatos = new DataSet();
+                daAdaptador.Fill(dtDatos);
+
+                status.status = "Error";
+                status.description = "Access denied";
+
+                foreach (DataRow _dr in dtDatos.Tables[0].Rows)
+                {
+                    if (status.Data == null)
+                    {
+                        status.Data = new Login();
+                    }
+                    status.Data.name = _dr["firstName"].ToString() + " " + _dr["lastName"].ToString();
+                    status.Data.user = _dr["idAdmin"].ToString();
+                    status.status = "Success";
+                    status.description = "Allowed access";              
+                }
+
+            }catch(Exception ex)
+            {
+                status.status = "Error";
+                status.description = ex.Message;
+            }
+            return status;
+            
+        }
 
         public static Status CreateUser(string rut, string firstName, string lastName, string idDevice, string idPlataform)
         {          
             Status status = new Status();
 
+            rut = removeRut(rut);
             try 
             {
                 string sqlCountUser = @"SELECT COUNT(*) FROM dbo.Users WHERE idUsers = @usuario";
 
                 SqlConnection conn = new SqlConnection(connectionString: conex);
                 SqlCommand command = new SqlCommand(sqlCountUser, conn);
-                command.Parameters.AddWithValue("@usuario", rut);
+                command.Parameters.AddWithValue("@usuario", removeRut(rut));
                 
                 int countU = 0;
                 int countD = 0;                
@@ -451,7 +501,7 @@ namespace Connection_PushBBVA
         public static Status DeleteUser(string rut) 
         {
             Status status = new Status();
-
+            rut = removeRut(rut);
             try
             {
                 string selectDevice = @"SELECT D.idDevice FROM dbo.Device D, dbo.Users_Device DU WHERE D.idDevice = DU.idDevice AND DU.idUsers = @rut";
@@ -506,7 +556,7 @@ namespace Connection_PushBBVA
         public static Status<List<Data_PushBBVA.Notification>> Notification(string rut, string idNotificationType, string Limit)
         {
             Status<List<Data_PushBBVA.Notification>> status = new Status<List<Data_PushBBVA.Notification>>();
-
+            rut = removeRut(rut);
             try
             {
                 string SelectNotification = "";
@@ -651,6 +701,7 @@ namespace Connection_PushBBVA
         public static Status Setting(string rut, string idNotificationType)
         {
             Status status = new Status();
+            rut = removeRut(rut);
             try
             {
 
@@ -777,11 +828,11 @@ namespace Connection_PushBBVA
         public static Status<List<NotificationType>> ListSetting(string rut)
         {
             Status<List<NotificationType>> status = new Status<List<NotificationType>>();
-
+            rut = removeRut(rut);
             try
             {
 
-                string selectNotificationType = @"SELECT NT.idNotificationType, Nt.title, NTU.status, NT.start FROM dbo.NotificationType_Users NTU, dbo.NotificationType NT WHERE NT.idnotificationType = NTU.idNotificationType AND  NTU.idUsers = @idUsers";
+                string selectNotificationType = @"SELECT NT.idNotificationType, Nt.title, NTU.status, NT.start, NT.duration FROM dbo.NotificationType_Users NTU, dbo.NotificationType NT WHERE NT.idnotificationType = NTU.idNotificationType AND  NTU.idUsers = @idUsers";
 
 
                 SqlConnection conn = new SqlConnection(connectionString: conex);
@@ -808,6 +859,7 @@ namespace Connection_PushBBVA
                     Type.title = _dr[1].ToString();
                     Type.status = _dr[2].ToString();
                     Type.start = _dr[3].ToString();
+                    Type.duration = int.Parse(_dr[4].ToString());
 
                     status.Data.Add(Type);
                 }
@@ -856,7 +908,7 @@ namespace Connection_PushBBVA
         {
             Status status = new Status();
 
-            
+            rut = removeRut(rut);
             try
             {
                 var push = new PushSharp.PushBroker();
@@ -868,10 +920,7 @@ namespace Connection_PushBBVA
                 push.OnDeviceSubscriptionExpired += DeviceSubscriptionExpired;
                 push.OnDeviceSubscriptionChanged += DeviceSubscriptionChanged;
                 push.OnChannelCreated += ChannelCreated;
-                push.OnChannelDestroyed += ChannelDestroyed;
-
-
-             
+                push.OnChannelDestroyed += ChannelDestroyed;          
 
             
 
@@ -896,36 +945,50 @@ namespace Connection_PushBBVA
                 status.status = "Error";
                 status.description = "unregistered user";
 
+                string file = System.Configuration.ConfigurationManager.AppSettings["FILE"];
+                string password = System.Configuration.ConfigurationManager.AppSettings["PASSWORD"];
+                string appID = System.Configuration.ConfigurationManager.AppSettings["APPID"];
+
+
                 foreach (DataRow _dr in dtDatos.Tables[0].Rows)
                 {
-                   string text = base64ToText(shortText);
-                   //var text = Convert.FromBase64String(shortText);
-                    if (_dr[1].ToString() == "2")
+                    try
                     {
-                        var appleCert = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Certificados.p12"));
-                        push.RegisterAppleService(new ApplePushChannelSettings(false, appleCert, "q1w2e3r4"));
-                        push.QueueNotification(new AppleNotification()
-                                                   .ForDeviceToken(_dr[0].ToString())
-                                                   .WithAlert(text.ToString())
-                                                   .WithBadge(-1)
-                                                   .WithSound("sound.caf"));
-                        push.StopAllServices();
-                        status.status = "Success";
-                        status.description = "Send iOS";
+                        string stext = base64ToText(shortText);
+                        string ltext = base64ToText(longText);
+                        //var text = Convert.FromBase64String(shortText);
+                        if (_dr[1].ToString() == "2")
+                        {
+                            var appleCert = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, file));
+                            push.RegisterAppleService(new ApplePushChannelSettings(false, appleCert, password));
+                            push.QueueNotification(new AppleNotification()
+                                                       .ForDeviceToken(_dr[0].ToString())
+                                                       .WithAlert(stext.ToString())
+                                                       .WithBadge(-1)
+                                                       .WithSound("sound.caf"));
+                            push.StopAllServices();
+                            status.status = "Success";
+                            status.description = "Send iOS";
 
-                       Historical(idNotificationType, rut, _dr[0].ToString(), _dr[1].ToString(), shortText, longText);
+                            Historical(idNotificationType, rut, _dr[0].ToString(), _dr[1].ToString(), stext, ltext);
+                        }
+                        else if (_dr[1].ToString() == "1")
+                        {
+                            push.RegisterGcmService(new GcmPushChannelSettings(appID));
+
+                            push.QueueNotification(new GcmNotification().ForDeviceRegistrationId(_dr[0].ToString())
+                                                  .WithJson("{\"alert\":\"+ stext.ToString +\",\"badge\":7,\"sound\":\"sound.caf\"}"));
+                            push.StopAllServices();
+                            status.status = "Success";
+                            status.description = "Send Android";
+
+                            Historical(idNotificationType, rut, _dr[0].ToString(), _dr[1].ToString(), stext, ltext);
+                        }
                     }
-                    else if (_dr[1].ToString() == "1")
+                    catch (Exception ex)
                     {
-                        push.RegisterGcmService(new GcmPushChannelSettings("AIzaSyBbsQnPByBI484hHMLOC_FRLowkIKqlWO0"));
-
-                        push.QueueNotification(new GcmNotification().ForDeviceRegistrationId(_dr[0].ToString())
-                                              .WithJson("{\"alert\":\"+ text +\",\"badge\":7,\"sound\":\"sound.caf\"}"));
-                        push.StopAllServices();
-                        status.status = "Success";
-                        status.description = "Send Android";
-
-                        Historical(idNotificationType, rut, _dr[0].ToString(), _dr[1].ToString(), shortText, longText);
+                        status.status = "Error";
+                        status.description = ex.Message;
                     }
                 }
                
@@ -965,45 +1028,304 @@ namespace Connection_PushBBVA
             }
         }
 
+        public static Status readExcel()
+        {
+            Status status = new Status();
+            int x = 0;
+
+            SqlConnection conn = new SqlConnection(connectionString: conex);
+            SqlCommand command;
+
+            try
+            {
+                string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ConfigurationManager.AppSettings["inputFile"]).ToString();
+
+                OleDbConnection con = new System.Data.OleDb.OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + file +";Mode=ReadWrite;Extended Properties=\"Excel 12.0 Xml;HDR=YES;IMEX=1\"");
+                con.Open();
+                DataSet dset = new DataSet();
+                OleDbDataAdapter dadp = new OleDbDataAdapter("SELECT * FROM [Hoja 1$]", con);
+                dadp.TableMappings.Add("tbl", "Table");
+                dadp.Fill(dset);
+                DataTable table = dset.Tables[0];
+                conn.Open();
+                for (int i = 0; i < table.Rows.Count; i++)
+                {
+                    if (table.Rows[i][0].ToString() != "" && table.Rows[i][1].ToString() != "" && table.Rows[i][2].ToString() != "" && table.Rows[i][3].ToString() != "")
+                    {
+                        try
+                        {
+                            string user = table.Rows[i][0].ToString();
+                            string type = table.Rows[i][1].ToString();
+                            string shortTecxt = table.Rows[i][3].ToString();
+                            string longText = table.Rows[i][4].ToString();
+
+                            string selectDevice = @"SELECT D.idDevice, D.idPlataform 
+                        FROM dbo.Device D, dbo.Users_Device UD, dbo.NotificationType_Users NTU
+                        WHERE D.status = 1  AND D.idDevice = UD.idDevice AND NTU.status = 1 AND NTU.idNotificationType = @idNotificationType AND NTU.idUsers = UD.idUsers AND UD.idUsers = @idUsers ";
+
+                            command = new SqlCommand(selectDevice, conn);
+                            command.Parameters.AddWithValue("@idUsers", user);
+                            command.Parameters.AddWithValue("@idNotificationType", type);
+
+                            SqlDataAdapter daAdaptador = new SqlDataAdapter(command);
+                            DataSet dtDatos = new DataSet();
+                            daAdaptador.Fill(dtDatos);
+
+                            foreach (DataRow _dr in dtDatos.Tables[0].Rows)
+                            {
+                                try
+                                {
+                                    string selectNotificationtype = @"INSERT INTO [dbo].[Notification]
+                                         ([idDevice]
+                                         ,[token]
+                                         ,[idNotificationType]
+                                         ,[title]
+                                         ,[text]
+                                         ,[idPlataform]
+                                         ,[creation]
+                                         ,[idUsers]
+                                         ,[firstName]
+                                         ,[lastName]
+                                         ,[shortText]
+                                         ,[longText])
+                                   VALUES
+                                         (@idDevice               
+                                         ,@token
+                                         ,@idNotificationType  
+                                         ,@title
+                                         ,@text
+                                         ,@idPlataform
+                                         ,GETDATE()
+                                         ,@idUsers
+                                         ,@firstName
+                                         ,@lastName
+                                         ,@shortText
+                                         ,@longText)";
+                                 
+
+                                    command = new SqlCommand(selectNotificationtype, conn);
+                                    command.Parameters.AddWithValue("@idDevice", _dr[0].ToString());
+                                    command.Parameters.AddWithValue("@token", "");
+                                    command.Parameters.AddWithValue("@idNotificationType", type);
+                                    command.Parameters.AddWithValue("@title", "");
+                                    command.Parameters.AddWithValue("@text", "");
+                                    command.Parameters.AddWithValue("@idPlataform", _dr[1].ToString());
+                                    command.Parameters.AddWithValue("@idUsers", user);
+                                    command.Parameters.AddWithValue("@firstName", "");
+                                    command.Parameters.AddWithValue("@lastName", "");
+                                    command.Parameters.AddWithValue("@shortText", shortTecxt);
+                                    command.Parameters.AddWithValue("@longText", longText);
+                                    command.ExecuteScalar();
+                                    x++;
+                                    status.status = "Success";
+                                    status.description = "Create file";
+                                }
+                                catch (Exception ex2)
+                                {
+
+                                    status.status = "Error";
+                                    status.description = ex2.Message ;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            status.status = "Error";
+                            status.description =  ex.Message;
+                        }
+                    }
+                
+               
+
+
+                }
+                conn.Close();
+
+                status.status = "Success";
+                status.description = "Enviados "+ x.ToString() +" Notificaciones";
+
+            }
+            catch (Exception ex)
+            {
+                status.status = "Error";
+                status.description = x.ToString() +" "+ ex.Message;
+            }
+            return status;
+
+        }
+
+        public static Status writeExcel() 
+        {
+            Status status = new Status();
+
+            string Users = "";
+            int i = 0;
+
+            List<string> User = new List<string>();
+
+            string users = @"Select idUsers FROM dbo.Users WHERE status = 1";
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString: conex))
+                {
+
+                    SqlCommand command = new SqlCommand(users, conn);
+                    conn.Open();
+                    SqlDataAdapter daAdaptador = new SqlDataAdapter(command);
+                    DataSet dtDatos = new DataSet();
+                    daAdaptador.Fill(dtDatos);
+
+
+                    foreach (DataRow _dr in dtDatos.Tables[0].Rows)
+                    {
+
+                        string user = _dr[0].ToString();
+
+                        Users =  "<tr><td>"+ user + "</td>";
+                        try
+                        {
+                            string Types = @"SELECT * FROM dbo.NotificationType_Users NTU, dbo.Users U WHERE NTU.idUsers = U.idUsers AND U.idUsers = @rut";
+
+                            using (SqlConnection conn2 = new SqlConnection(connectionString: conex))
+                            {
+                                SqlCommand command2 = new SqlCommand(Types, conn2);
+                                command2.Parameters.AddWithValue("@rut", user);
+                                conn2.Open();
+                                SqlDataAdapter daAdaptador2 = new SqlDataAdapter(command2);
+                                DataSet dtDatos2 = new DataSet();
+                                daAdaptador2.Fill(dtDatos2);
+                                foreach (DataRow _dr2 in dtDatos2.Tables[0].Rows)
+                                {
+                                    if (_dr2[2].ToString() == "True")
+                                    {
+                                        Users += "<td>"+1 + "</td>";
+                                    }
+                                    else
+                                    {
+                                        Users += "<td>"+ 0 + "</td>";
+                                    }
+                                }
+                                Users += "</tr>";
+                            }
+
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+
+                        User.Add(Users);
+
+                    }
+                    try
+                    {
+                        List<string> reads = new List<string>();
+
+                        StreamWriter write;
+
+                        write = new StreamWriter(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ConfigurationManager.AppSettings["ftpFile"]));
+
+
+                        write.WriteLine("<html><table>");
+                        for (i = 0; i <= User.Count - 1; i++)
+                        {
+                            write.WriteLine(User[i]);
+                        }
+                        write.WriteLine("</table></html>");
+
+                        write.Close();
+
+
+                        status.status = "Success";
+                        status.description = "Create file";
+
+                        //FtpWebRequest request = (FtpWebRequest)FtpWebRequest.Create(ConfigurationManager.AppSettings["ftpRoute"] + ConfigurationManager.AppSettings["ftpFile"]);
+                        //request.Method = WebRequestMethods.Ftp.UploadFile;
+                        //request.Credentials = new NetworkCredential(ConfigurationManager.AppSettings["ftpUser"], ConfigurationManager.AppSettings["ftpPass"]);
+                        //request.UsePassive = true;
+                        //request.KeepAlive = true;
+
+                        //FileStream stream = File.OpenRead(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ConfigurationManager.AppSettings["ftpFile"]));
+
+                        //byte[] buffer = new byte[stream.Length];
+                        //stream.Read(buffer, 0, buffer.Length);
+                        //stream.Close();
+
+                        //Stream reqStream = request.GetRequestStream();
+                        //reqStream.Write(buffer, 0, buffer.Length);
+                        //reqStream.Flush();
+                        //reqStream.Close();
+                       
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        status.status = "Error";
+                        status.description = ex.Message;
+                    }
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                status.status = "Error";
+                status.description = ex.Message;
+            }
+
+
+
+
+       
+
+
+
+            return status;
+        
+        }
+
         static void DeviceSubscriptionChanged(object sender, string oldSubscriptionId, string newSubscriptionId, PushSharp.Core.INotification notification)
         {
             //Currently this event will only ever happen for Android GCM
-            Console.WriteLine("Device Registration Changed:  Old-> " + oldSubscriptionId + "  New-> " + newSubscriptionId + " -> " + notification);
+           // Console.WriteLine("Device Registration Changed:  Old-> " + oldSubscriptionId + "  New-> " + newSubscriptionId + " -> " + notification);
         }
 
         static void NotificationSent(object sender, PushSharp.Core.INotification notification)
         {
-            Console.WriteLine("Sent: " + sender + " -> " + notification);
+            //Console.WriteLine("Sent: " + sender + " -> " + notification);
         }
 
         static void NotificationFailed(object sender, PushSharp.Core.INotification notification, Exception notificationFailureException)
         {
-            Console.WriteLine("Failure: " + sender + " -> " + notificationFailureException.Message + " -> " + notification);
+           // Console.WriteLine("Failure: " + sender + " -> " + notificationFailureException.Message + " -> " + notification);
         }
 
         static void ChannelException(object sender, PushSharp.Core.IPushChannel channel, Exception exception)
         {
-            Console.WriteLine("Channel Exception: " + sender + " -> " + exception);
+          //  Console.WriteLine("Channel Exception: " + sender + " -> " + exception);
         }
 
         static void ServiceException(object sender, Exception exception)
         {
-            Console.WriteLine("Channel Exception: " + sender + " -> " + exception);
+         //   Console.WriteLine("Channel Exception: " + sender + " -> " + exception);
         }
 
         static void DeviceSubscriptionExpired(object sender, string expiredDeviceSubscriptionId, DateTime timestamp, PushSharp.Core.INotification notification)
         {
-            Console.WriteLine("Device Subscription Expired: " + sender + " -> " + expiredDeviceSubscriptionId);
+          //  Console.WriteLine("Device Subscription Expired: " + sender + " -> " + expiredDeviceSubscriptionId);
         }
 
         static void ChannelDestroyed(object sender)
         {
-            Console.WriteLine("Channel Destroyed for: " + sender);
+            //Console.WriteLine("Channel Destroyed for: " + sender);
         }
 
         static void ChannelCreated(object sender, PushSharp.Core.IPushChannel pushChannel)
         {
-            Console.WriteLine("Channel Created for: " + sender);
+           // Console.WriteLine("Channel Created for: " + sender);
         }
 
         static string textToBase64(string sAscii)
@@ -1018,7 +1340,14 @@ namespace Connection_PushBBVA
             byte[] bytes = System.Convert.FromBase64String(sbase64);
             System.Text.ASCIIEncoding encoding = new System.Text.ASCIIEncoding();
             return encoding.GetString(bytes, 0, bytes.Length);
-        } 
+        }
+
+        static string removeRut(string rut)
+        {
+            rut = rut.Replace(".", "");
+            rut = rut.Replace("-", "");
+            return rut;
+        }
         
         ///////// ANTIGUOS ///////////////
 

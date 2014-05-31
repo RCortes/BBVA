@@ -13,6 +13,13 @@ namespace WCF_PushBBVA
     
     public class Service1 : IService1
     {
+
+        public Status<Login> Login(String user, String pass)
+        {
+            Status<Login> resultado = SQLConnection.Login(user, pass);
+            return resultado;
+        }
+
         public Status Create(string rut, string firstName, string lastName, string idDevice, string idPlataform)
         {
             Status status = SQLConnection.CreateUser(rut, firstName, lastName, idDevice, idPlataform);
@@ -67,7 +74,18 @@ namespace WCF_PushBBVA
             Status status = SQLConnection.readNotification(idHistorical);
             return status;
         }
+
+        public Status readExcel()
+        {
+            Status status = SQLConnection.readExcel();
+            return status;
+        }
         
+        public Status writeExcel()
+        {
+            Status status = SQLConnection.writeExcel();
+            return status;
+        }
 
 
 

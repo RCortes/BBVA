@@ -1,0 +1,98 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPage.master.cs" Inherits="MasterPage" %>
+
+
+
+
+<!DOCTYPE html>
+
+	<head>
+
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+        <asp:ContentPlaceHolder id="head" runat="server">
+        </asp:ContentPlaceHolder>
+	</head>
+
+	<body>
+         <form id="form1" runat="server">
+		<header>	<!-- Header -->
+
+			<article class="head">
+				
+				<section class="titulo">
+					<h2>Administrador</h2>
+					<h1>Notificaciones PUSH</h1>
+				</section>
+
+				<section class="login">
+					Bienvenido, <!-- Insertar login acá, reemplazando "nombreUsuario" --> nombreUsuario <a href="index.html">Salir</a><!-- También dummy url. -->
+				</section>
+
+			</article>
+
+			<article class="menu"> <!-- href="" fijos, que se deben cambiar en la versión final. Sólo son de muestra. -->
+
+				<section class="btmenu">					
+					<a href="mensajes_enviados.html"><div data-icon="b"></div>Mensajes enviados</a>
+				</section>
+				
+				<section class="btmenu">
+					<a href="desubscribir.html"><div data-icon="c"></div>Desuscribir mensajes</a>
+				</section>
+
+				<section class="btmenu">
+					<a href="subir_excel.html"><div data-icon="a"></div>Subir Excel</a>
+				</section>
+
+				<section class="btmenu">
+					<a href="informes.html"><div data-icon="d"></div>Descargar informes</a>
+				</section>
+
+				<section class="btmenu">
+					<a href="configurar.html"><div data-icon="e"></div>Configurar mensajes</a>
+				</section>
+
+			</article>
+
+		</header>
+              <asp:ContentPlaceHolder id="ContentPlaceHolder1" runat="server">
+
+                          </asp:ContentPlaceHolder>
+		<footer class="footer"><!-- Footer -->
+
+			<p>Todos los derechos reservados &#8211; <a href="http://www.movidreams.com">movidreams.com</a></p>
+
+		</footer>
+       </form>
+	</body>	
+
+
+</html>
+
+
+
+
+
+
+
+
+
+<%--<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <asp:ContentPlaceHolder id="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div>
+        <asp:ContentPlaceHolder id="ContentPlaceHolder1" runat="server">
+        
+        </asp:ContentPlaceHolder>
+    </div>
+    </form>
+</body>
+</html>--%>

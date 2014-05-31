@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+	<head>
+
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+
+	</head>
+
+	<body>
+
+		<header>	<!-- Header -->
+
+			<article class="head">
+				
+				<section class="titulo">
+					<h2>Administrador</h2>
+					<h1>Notificaciones PUSH</h1>
+				</section>
+
+				<section class="login">
+					Bienvenido, <!-- Insertar login acá, reemplazando "nombreUsuario" --> nombreUsuario <a href="index.html">Salir</a> <!-- También dummy url. -->
+				</section>
+
+			</article>
+
+			<article class="menu"> <!-- href="" fijos, que se deben cambiar en la versión final. Sólo son de muestra. -->
+
+				<section class="btmenu">					
+					<a href="mensajes_enviados.html"><div data-icon="b"></div>Mensajes enviados</a>
+				</section>
+				
+				<section class="btmenu">
+					<a href="desubscribir.html"><div data-icon="c"></div>Desuscribir mensajes</a>
+				</section>
+
+				<section class="btmenu">
+					<a href="subir_excel.html"><div data-icon="a"></div>Subir Excel</a>
+				</section>
+
+				<section class="btmenu">
+					<a href="informes.html"><div data-icon="d"></div>Descargar Informes</a>
+				</section>
+
+				<section class="btmenu">
+					<a href="configurar.html"><div data-icon="e"></div>Configurar mensajes</a>
+				</section>
+
+			</article>
+
+		</header>
+
+		<section class="content" style="padding-bottom:50px;"><!-- Content -->
+
+			<!-- Todo esto es un ejemplo cosmético de cómo deben lucir esta parte de la página. -->
+
+			<section class="loginUno"> 
+
+				<h1>Subir Excel</h1>
+				
+				<div class="franja"></div>
+
+				<form class="ingresar">
+									
+					<div id="up">
+						
+						<div class="upload">
+							<input type="file" name="upload">
+						</div>
+						<input type="button" id="uploadbt" onclick="uploadShow()" value="Subir archivo">
+						<a href="#">Descargar Excel de ejemplo</a>
+					
+					</div>
+					
+					<div id="gif" style="display:none;"></div>
+				
+				</form>
+
+			</section>
+
+			<section id="loginDos" style="display:none;">
+
+				<ul>
+					<li style="color:#44A718;">Subiendo Excel</li> <!-- Color de que el proceso funcionó correctamente -->
+					<li style="color:#ff0000;">Leyendo Excel</li> <!-- Color de error. -->
+					<li style="color:#114b90;">Enviando notificaciones ...</li> <!-- Color de proceso en funcionamiento. El "..." debe ser dinámico igual. -->
+					<li>Se han enviado X notificaciones</li> <!-- Color de "todavía falta para que trabaje". -->
+				</ul>
+
+			</section>
+
+			<script>
+
+				function uploadShow() {
+					document.getElementById('up').style.display="none";
+					document.getElementById('loginDos').style.display = "block";
+					document.getElementById('gif').style.display = "block";
+				}
+
+			</script> <!-- Fin upload. -->
+
+		</section> 
+
+		<footer class="footer"><!-- Footer -->
+
+			<p>Todos los derechos reservados &#8211; <a href="http://www.movidreams.com">movidreams.com</a></p>
+
+		</footer>
+
+	</body>	
+
+
+</html>

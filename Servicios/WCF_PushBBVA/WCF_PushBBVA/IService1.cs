@@ -13,9 +13,12 @@ namespace WCF_PushBBVA
     public interface IService1
     {
 
-
-
-
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+            ResponseFormat = WebMessageFormat.Xml,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest,
+            UriTemplate = "Login/{user},{pass}")]
+        Status<Login> Login(string user, string pass);
 
         [OperationContract]
         [WebInvoke(Method = "GET",
@@ -83,18 +86,29 @@ namespace WCF_PushBBVA
             UriTemplate = "readNotification/{idHistorical}")]
          Status readNotification(string idHistorical);
 
+          [OperationContract]
+        [WebInvoke(Method = "GET",
+            ResponseFormat = WebMessageFormat.Xml,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest,
+            UriTemplate = "readExcel")]
+          Status readExcel();
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+            ResponseFormat = WebMessageFormat.Xml,
+            BodyStyle = WebMessageBodyStyle.WrappedRequest,
+            UriTemplate = "writeExcel")]
+          Status writeExcel();
+        
+        
+
         ////////////// ANTIGUOS /////////////////////
 
 
 
 
 
-        //[OperationContract]
-        //[WebInvoke(Method = "GET",
-        //    ResponseFormat = WebMessageFormat.Xml,
-        //    BodyStyle = WebMessageBodyStyle.WrappedRequest,
-        //    UriTemplate = "Login/{user},{pass}")]
-        //bool DoWork(string user, string pass);
+
 
         //[OperationContract]
         //[WebInvoke(Method = "GET",

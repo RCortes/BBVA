@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+	<head>
+
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+
+	</head>
+
+	<body>
+
+		<header>	<!-- Header -->
+
+			<article class="head">
+				
+				<section class="titulo">
+					<h2>Administrador</h2>
+					<h1>Notificaciones PUSH</h1>
+				</section>
+
+				<section class="login">
+					Bienvenido, <!-- Insertar login acá, reemplazando "nombreUsuario" --> nombreUsuario <a href="index.html">Salir</a> <!-- También dummy url. -->
+				</section>
+
+			</article>
+
+			<article class="menu"> <!-- href="" fijos, que se deben cambiar en la versión final. Sólo son de muestra. -->
+
+				<section class="btmenu">					
+					<a href="mensajes_enviados.html"><div data-icon="b"></div>Mensajes enviados</a>
+				</section>
+				
+				<section class="btmenu">
+					<a href="desubscribir.html"><div data-icon="c"></div>Desuscribir mensajes</a>
+				</section>
+
+				<section class="btmenu">
+					<a href="subir_excel.html"><div data-icon="a"></div>Subir Excel</a>
+				</section>
+
+				<section class="btmenu">
+					<a href="informes.html"><div data-icon="d"></div>Descargar Informes</a>
+				</section>
+
+				<section class="btmenu">
+					<a href="configurar.html"><div data-icon="e"></div>Configurar mensajes</a>
+				</section>
+
+			</article>
+
+		</header>
+
+		<section class="content" style="padding-bottom:50px;"><!-- Content -->
+
+			<section class="loginUno">
+
+				<h1>Desubscribir mensajes</h1>
+				
+				<div class="franja"></div>
+
+				<form class="ingresar">
+					<input type"text" class="textbox" value="Ingresar RUT">
+					<form><input type="button" class="ingbt" onclick="mostrar()" value="Desubscribir"></form> 
+				</form>
+
+			</section>
+
+			<section id="loginDos" style="display:none;">
+
+				<p>El RUT <b>12.345.678-9</b> <!-- El número de RUT cambia, no es fijo como el resto del texto. --> ha dejado de recibir mensajes a su equipo celular.</p>
+
+			</section>
+
+			<script>
+
+				function mostrar() {
+					document.getElementById('loginDos').style.display = "block";
+				}
+
+			</script>
+
+		</section>
+
+		<footer class="footer"><!-- Footer -->
+
+			<p>Todos los derechos reservados &#8211; <a href="http://www.movidreams.com">movidreams.com</a></p>
+
+		</footer>
+
+	</body>	
+
+
+</html>
