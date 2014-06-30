@@ -1,0 +1,262 @@
+/* ---------------------------------------------------------------------- */
+/* Script generated with: DeZign for Databases V8.1.2                     */
+/* Target DBMS:           MS SQL Server 2008                              */
+/* Project file:          Model_BBVA_Notification_05052014.dez            */
+/* Project name:                                                          */
+/* Author:                                                                */
+/* Script type:           Database creation script                        */
+/* Created on:            2014-06-27 19:18                                */
+/* ---------------------------------------------------------------------- */
+
+
+/* ---------------------------------------------------------------------- */
+/* Add tables                                                             */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Add table "Admin"                                                      */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+CREATE TABLE [Admin] (
+    [idAdmin] INTEGER IDENTITY(1,1) NOT NULL,
+    [firstName] VARCHAR(150),
+    [lastName] VARCHAR(150),
+    [password] VARCHAR(500),
+    [creation] DATETIME,
+    [status] BIT,
+    CONSTRAINT [PK_Admin] PRIMARY KEY ([idAdmin])
+)
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Add table "Users"                                                      */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+CREATE TABLE [Users] (
+    [idUsers] VARCHAR(50) NOT NULL,
+    [firstName] VARCHAR(150),
+    [lastName] VARCHAR(150),
+    [creation] DATETIME,
+    [status] BIT,
+    CONSTRAINT [PK_Users] PRIMARY KEY ([idUsers])
+)
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Add table "Plataform"                                                  */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+CREATE TABLE [Plataform] (
+    [idPlataform] INTEGER IDENTITY(1,1) NOT NULL,
+    [description] VARCHAR(350),
+    CONSTRAINT [PK_Plataform] PRIMARY KEY ([idPlataform])
+)
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Add table "NotificationType"                                           */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+CREATE TABLE [NotificationType] (
+    [idNotificationType] INTEGER IDENTITY(1,1) NOT NULL,
+    [title] VARCHAR(100),
+    [text] VARCHAR(500),
+    [greeting] VARCHAR(50),
+    [start] DATETIME,
+    [duration] INTEGER,
+    CONSTRAINT [PK_NotificationType] PRIMARY KEY ([idNotificationType])
+)
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Add table "NotificationType_Users"                                     */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+CREATE TABLE [NotificationType_Users] (
+    [idNotificationType] INTEGER NOT NULL,
+    [idUsers] VARCHAR(40) NOT NULL,
+    [status] BIT,
+    CONSTRAINT [PK_NotificationType_Users] PRIMARY KEY ([idNotificationType], [idUsers])
+)
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Add table "Notification"                                               */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+CREATE TABLE [Notification] (
+    [idNotificacion] INTEGER IDENTITY(1,1) NOT NULL,
+    [idDevice] VARCHAR(500),
+    [token] VARCHAR(500),
+    [idNotificationType] INTEGER,
+    [title] VARCHAR(40),
+    [text] VARCHAR(2000),
+    [idPlataform] INTEGER,
+    [creation] DATETIME,
+    [idUsers] VARCHAR(50),
+    [firstName] VARCHAR(150),
+    [lastName] VARCHAR(150),
+    [shortText] VARCHAR(1500),
+    [longText] VARCHAR(2000),
+    [deliveryPossibilities] INTEGER,
+    [expiration] DATETIME,
+    CONSTRAINT [PK_Notification] PRIMARY KEY ([idNotificacion])
+)
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Add table "HoldOver"                                                   */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+CREATE TABLE [HoldOver] (
+    [idHoldOver] INTEGER NOT NULL,
+    [creation] DATETIME,
+    [expiration] DATETIME,
+    [idNotificationType] INTEGER,
+    [idUser] VARCHAR(50),
+    [idDevice] VARCHAR(500),
+    [idPlataform] INTEGER,
+    [shortText] VARCHAR(1500),
+    [longText] VARCHAR(2000),
+    [status] BIT,
+    [deliveryPossibilities] INTEGER,
+    CONSTRAINT [PK_HoldOver] PRIMARY KEY ([idHoldOver])
+)
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Add table "Device"                                                     */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+CREATE TABLE [Device] (
+    [idDevice] VARCHAR(500) NOT NULL,
+    [token] VARCHAR(500),
+    [appVersion] VARCHAR(40),
+    [creation] DATETIME,
+    [status] BIT,
+    [idPlataform] INTEGER NOT NULL,
+    CONSTRAINT [PK_Device] PRIMARY KEY ([idDevice], [idPlataform])
+)
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Add table "Users_Device"                                               */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+CREATE TABLE [Users_Device] (
+    [idUsers] VARCHAR(50) NOT NULL,
+    [idDevice] VARCHAR(500) NOT NULL,
+    CONSTRAINT [PK_Users_Device] PRIMARY KEY ([idUsers], [idDevice])
+)
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Add table "Historical"                                                 */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+CREATE TABLE [Historical] (
+    [idHistorical] INTEGER IDENTITY(1,1) NOT NULL,
+    [creation] DATETIME,
+    [delivery] DATETIME,
+    [idNotificationType] INTEGER NOT NULL,
+    [idUsers] VARCHAR(50) NOT NULL,
+    [idDevice] VARCHAR(500) NOT NULL,
+    [idPlataform] INTEGER NOT NULL,
+    [shortText] VARCHAR(1500),
+    [longText] VARCHAR(2000),
+    [status] BIT,
+    [deliveryPossibilities] VARCHAR(40),
+    [expiration] DATETIME,
+    CONSTRAINT [PK_Historical] PRIMARY KEY ([idHistorical], [idNotificationType], [idUsers], [idDevice], [idPlataform])
+)
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Add foreign key constraints                                            */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+ALTER TABLE [Device] ADD CONSTRAINT [Plataform_Device] 
+    FOREIGN KEY ([idPlataform]) REFERENCES [Plataform] ([idPlataform])
+GO
+
+
+ALTER TABLE [NotificationType_Users] ADD CONSTRAINT [NotificationType_NotificationType_Users] 
+    FOREIGN KEY ([idNotificationType]) REFERENCES [NotificationType] ([idNotificationType])
+GO
+
+
+ALTER TABLE [NotificationType_Users] ADD CONSTRAINT [Users_NotificationType_Users] 
+    FOREIGN KEY ([idUsers]) REFERENCES [Users] ([idUsers])
+GO
+
+
+ALTER TABLE [Users_Device] ADD CONSTRAINT [Users_Users_Device] 
+    FOREIGN KEY ([idUsers]) REFERENCES [Users] ([idUsers])
+GO
+
+
+ALTER TABLE [Users_Device] ADD CONSTRAINT [Device_Users_Device] 
+    FOREIGN KEY ([idDevice]) REFERENCES [Device] ([idDevice])
+GO
+
+
+ALTER TABLE [Historical] ADD CONSTRAINT [NotificationType_Historical] 
+    FOREIGN KEY ([idNotificationType]) REFERENCES [NotificationType] ([idNotificationType])
+GO
+
+
+ALTER TABLE [Historical] ADD CONSTRAINT [Users_Historical] 
+    FOREIGN KEY ([idUsers]) REFERENCES [Users] ([idUsers])
+GO
+
+
+ALTER TABLE [Historical] ADD CONSTRAINT [Device_Historical] 
+    FOREIGN KEY ([idDevice], [idPlataform]) REFERENCES [Device] ([idDevice],[idPlataform])
+GO
+

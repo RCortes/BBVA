@@ -3,4 +3,3 @@ Z:\Github\BBVA\Console\writeSetting\writeSetting\writeSetting\bin\Release\writeS
 Z:\Github\BBVA\Console\writeSetting\writeSetting\writeSetting\bin\Release\writeSetting.pdb
 Z:\Github\BBVA\Console\writeSetting\writeSetting\writeSetting\obj\Release\writeSetting.exe
 Z:\Github\BBVA\Console\writeSetting\writeSetting\writeSetting\obj\Release\writeSetting.pdb
-Z:\Github\BBVA\Console\writeSetting\writeSetting\writeSetting\obj\Release\writeSetting.csprojResolveAssemblyReference.cache

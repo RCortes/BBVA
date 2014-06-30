@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Configuration;
+using System.Diagnostics;
 
 namespace ReadNotifications
 {
@@ -16,6 +17,23 @@ namespace ReadNotifications
 
         static void Main(string[] args)
         {
+            Process[] localAll = Process.GetProcesses();
+            int p = 1;
+            foreach (Process pr in localAll)
+            {
+                if (pr.ProcessName == "ReadNotifications")
+                {
+                    if (p > 1) 
+                    {
+                        Console.Write("\n\n\n \"ReadNotifications.exe\" ya esta en ejecución... será cerrada");
+                        System.Threading.Thread.Sleep(3000);
+                        Environment.Exit(0);
+                    }
+                    p++;              
+                }
+            }
+
+
             List<string> reads = new List<string>();
 
             Console.Write("\n------------------------------------------------");

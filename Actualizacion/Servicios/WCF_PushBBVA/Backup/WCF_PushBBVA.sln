@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WCF_PushBBVA", "WCF_PushBBVA\WCF_PushBBVA.csproj", "{9D6FE6A2-3CEF-485F-A562-6D9A8A491E80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data_PushBBVA", "Data_PushBBVA\Data_PushBBVA.csproj", "{127025AB-732A-44D9-97E4-5205486834A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Connection_PushBBVA", "Connection_PushBBVA\Connection_PushBBVA.csproj", "{B5F509D9-9C2F-4B36-A202-2277E9AD69D0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9D6FE6A2-3CEF-485F-A562-6D9A8A491E80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D6FE6A2-3CEF-485F-A562-6D9A8A491E80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D6FE6A2-3CEF-485F-A562-6D9A8A491E80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D6FE6A2-3CEF-485F-A562-6D9A8A491E80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{127025AB-732A-44D9-97E4-5205486834A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{127025AB-732A-44D9-97E4-5205486834A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{127025AB-732A-44D9-97E4-5205486834A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{127025AB-732A-44D9-97E4-5205486834A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5F509D9-9C2F-4B36-A202-2277E9AD69D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5F509D9-9C2F-4B36-A202-2277E9AD69D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5F509D9-9C2F-4B36-A202-2277E9AD69D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5F509D9-9C2F-4B36-A202-2277E9AD69D0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

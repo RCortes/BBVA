@@ -1,0 +1,219 @@
+/* ---------------------------------------------------------------------- */
+/* Script generated with: DeZign for Databases V8.1.2                     */
+/* Target DBMS:           MS SQL Server 2008                              */
+/* Project file:          Model_BBVA_Notification_05052014.dez            */
+/* Project name:                                                          */
+/* Author:                                                                */
+/* Script type:           Database drop script                            */
+/* Created on:            2014-06-27 19:18                                */
+/* ---------------------------------------------------------------------- */
+
+
+/* ---------------------------------------------------------------------- */
+/* Drop foreign key constraints                                           */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+ALTER TABLE [Device] DROP CONSTRAINT [Plataform_Device]
+GO
+
+
+ALTER TABLE [NotificationType_Users] DROP CONSTRAINT [NotificationType_NotificationType_Users]
+GO
+
+
+ALTER TABLE [NotificationType_Users] DROP CONSTRAINT [Users_NotificationType_Users]
+GO
+
+
+ALTER TABLE [Users_Device] DROP CONSTRAINT [Users_Users_Device]
+GO
+
+
+ALTER TABLE [Users_Device] DROP CONSTRAINT [Device_Users_Device]
+GO
+
+
+ALTER TABLE [Historical] DROP CONSTRAINT [NotificationType_Historical]
+GO
+
+
+ALTER TABLE [Historical] DROP CONSTRAINT [Users_Historical]
+GO
+
+
+ALTER TABLE [Historical] DROP CONSTRAINT [Device_Historical]
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Drop table "Historical"                                                */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+/* Drop constraints */
+
+ALTER TABLE [Historical] DROP CONSTRAINT [PK_Historical]
+GO
+
+
+DROP TABLE [Historical]
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Drop table "Users_Device"                                              */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+/* Drop constraints */
+
+ALTER TABLE [Users_Device] DROP CONSTRAINT [PK_Users_Device]
+GO
+
+
+DROP TABLE [Users_Device]
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Drop table "Device"                                                    */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+/* Drop constraints */
+
+ALTER TABLE [Device] DROP CONSTRAINT [PK_Device]
+GO
+
+
+DROP TABLE [Device]
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Drop table "HoldOver"                                                  */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+/* Drop constraints */
+
+ALTER TABLE [HoldOver] DROP CONSTRAINT [PK_HoldOver]
+GO
+
+
+DROP TABLE [HoldOver]
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Drop table "Notification"                                              */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+/* Drop constraints */
+
+ALTER TABLE [Notification] DROP CONSTRAINT [PK_Notification]
+GO
+
+
+DROP TABLE [Notification]
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Drop table "NotificationType_Users"                                    */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+/* Drop constraints */
+
+ALTER TABLE [NotificationType_Users] DROP CONSTRAINT [PK_NotificationType_Users]
+GO
+
+
+DROP TABLE [NotificationType_Users]
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Drop table "NotificationType"                                          */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+/* Drop constraints */
+
+ALTER TABLE [NotificationType] DROP CONSTRAINT [PK_NotificationType]
+GO
+
+
+DROP TABLE [NotificationType]
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Drop table "Plataform"                                                 */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+/* Drop constraints */
+
+ALTER TABLE [Plataform] DROP CONSTRAINT [PK_Plataform]
+GO
+
+
+DROP TABLE [Plataform]
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Drop table "Users"                                                     */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+/* Drop constraints */
+
+ALTER TABLE [Users] DROP CONSTRAINT [PK_Users]
+GO
+
+
+DROP TABLE [Users]
+GO
+
+
+/* ---------------------------------------------------------------------- */
+/* Drop table "Admin"                                                     */
+/* ---------------------------------------------------------------------- */
+
+GO
+
+
+/* Drop constraints */
+
+ALTER TABLE [Admin] DROP CONSTRAINT [PK_Admin]
+GO
+
+
+DROP TABLE [Admin]
+GO
+

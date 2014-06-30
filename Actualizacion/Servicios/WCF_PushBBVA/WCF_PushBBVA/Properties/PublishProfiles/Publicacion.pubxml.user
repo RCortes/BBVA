@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+Este archivo es utilizado por el proceso de paquete/publicación de nuestro proyecto Web. Puede personalizar el comportamiento de este proceso
+editando este archivo MSBuild. Para conocer más acerca de esto, visite http://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="bin/Connection_PushBBVA.dll">
+      <publishTime>06/05/2014 15:36:29</publishTime>
+    </File>
+    <File Include="bin/Data_PushBBVA.dll">
+      <publishTime>06/05/2014 15:36:33</publishTime>
+    </File>
+    <File Include="bin/de/Npgsql.resources.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
+    </File>
+    <File Include="bin/es/Npgsql.resources.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
+    </File>
+    <File Include="bin/fi/Npgsql.resources.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
+    </File>
+    <File Include="bin/fr/Npgsql.resources.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
+    </File>
+    <File Include="bin/ja/Npgsql.resources.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
+    </File>
+    <File Include="bin/Mono.Security.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
+    </File>
+    <File Include="bin/Newtonsoft.Json.dll">
+      <publishTime>07/22/2013 13:36:13</publishTime>
+    </File>
+    <File Include="bin/Npgsql.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
+    </File>
+    <File Include="bin/PushSharp.Android.dll">
+      <publishTime>04/27/2014 17:30:21</publishTime>
+    </File>
+    <File Include="bin/PushSharp.Apple.dll">
+      <publishTime>04/27/2014 17:30:20</publishTime>
+    </File>
+    <File Include="bin/PushSharp.Core.dll">
+      <publishTime>04/27/2014 17:26:42</publishTime>
+    </File>
+    <File Include="bin/WCF_PushBBVA.dll">
+      <publishTime>06/05/2014 17:39:07</publishTime>
+    </File>
+    <File Include="bin/zh-CN/Npgsql.resources.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
+    </File>
+    <File Include="Service1.svc">
+      <publishTime>04/18/2014 22:57:13</publishTime>
+    </File>
+    <File Include="Web.config">
+      <publishTime>06/05/2014 17:39:09</publishTime>
+    </File>
+  </ItemGroup>
+</Project>

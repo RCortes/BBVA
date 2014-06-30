@@ -6,6 +6,7 @@ using PushSharp.Core;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
+using System.Diagnostics;
 
 namespace sendNotification
 {
@@ -18,7 +19,22 @@ namespace sendNotification
 
         static void Main(string[] args)
         {
-            
+            Process[] localAll = Process.GetProcesses();
+            int p = 1;
+            foreach (Process pr in localAll)
+            {
+                if (pr.ProcessName == "sendNotificationAndroid")
+                {
+                    if (p > 1)
+                    {
+                        Console.Write("\n\n\n \"sendNotificationAndroid.exe\" ya esta en ejecución... será cerrada");
+                        System.Threading.Thread.Sleep(3000);
+                        Environment.Exit(0);
+                    }
+                    p++;
+                }
+            }
+
             Console.Write("Envio de Notificaciones Android \n\n Procesando...");
 
             var push = new PushBroker();
@@ -31,9 +47,15 @@ namespace sendNotification
             push.OnDeviceSubscriptionChanged += DeviceSubscriptionChanged;
             push.OnChannelCreated += ChannelCreated;
             push.OnChannelDestroyed += ChannelDestroyed;
-         
+
             try
             {
+                SqlConnection conn = new SqlConnection(connectionString: conex);
+                conn.Open();
+
+
+                       
+                      
                 while (true)
                 {
                     string type = "";
@@ -42,12 +64,15 @@ namespace sendNotification
                     DateTime start = Convert.ToDateTime("00:00:00");
                     DateTime duration = Convert.ToDateTime("00:00:00");
 
-                    string sqlSelectSchedule = @"SELECT idNotificationType, start, duration FROM dbo.NotificationType";
+                    string sqlSelectSchedule = @"UPDATE dbo.NotificationType SET start = DATEADD (year, 2001 - YEAR(start), start)
+                                                 UPDATE dbo.NotificationType SET start = DATEADD (month, 01 - MONTH(start), start)
+                                                 UPDATE dbo.NotificationType SET start = DATEADD (day, 01 - DAY(start), start)
+                                                 SELECT idNotificationType, start, duration FROM dbo.NotificationType ORDER BY start ASC";
 
-                    SqlConnection conn = new SqlConnection(connectionString: conex);
+                    //conn = new SqlConnection(connectionString: conex);
                     SqlCommand command = new SqlCommand(sqlSelectSchedule, conn);
 
-                    conn.Open();
+
 
                     SqlDataAdapter daAdaptador = new SqlDataAdapter(command);
                     DataSet dtDatos = new DataSet();
@@ -57,12 +82,11 @@ namespace sendNotification
                     {
                         actual = DateTime.Parse("01-01-0001 " + DateTime.Now.ToShortTimeString());
                         start = DateTime.Parse("01-01-0001 " + DateTime.Parse(_dr[1].ToString()).ToShortTimeString());
-                        duration = DateTime.Parse("01-01-0001 " + DateTime.Parse(_dr[1].ToString()).ToShortTimeString()).AddMinutes(int.Parse(_dr[2].ToString()));
-                        
-                        if(DateTime.Compare(actual, start) >= 0 && DateTime.Compare(actual, duration) <= 0)
+                        duration = DateTime.Parse("01-01-0001 " + DateTime.Parse(_dr[1].ToString()).ToShortTimeString()).AddMinutes(15);
+
+                        if (DateTime.Compare(actual, start) >= 0)
                         {
                             type = _dr[0].ToString();
-                            break;
                         }
                     }
 
@@ -77,16 +101,17 @@ namespace sendNotification
                         dtDatos = new DataSet();
                         daAdaptador.Fill(dtDatos);
 
-                        int i = 0;
-
-
                         push.RegisterGcmService(new GcmPushChannelSettings(ConfigurationManager.AppSettings["configGCM"]));
 
+                        int i = 0;
                         List<string> IDs = new List<string>();
                         foreach (DataRow _dr in dtDatos.Tables[0].Rows)
                         {
+
+
+
                             push.QueueNotification(new GcmNotification().ForDeviceRegistrationId(_dr[1].ToString())
-                                .WithJson("{\"alert\":\"" + _dr[9].ToString() + " " + _dr[10].ToString() + " " + _dr[11].ToString() + "\",\"badge\":7,\"sound\":\"default.caf\"}"));
+                                .WithJson("{\"alert\":\"" + _dr[9].ToString() + " " + _dr[10].ToString() + " " + _dr[11].ToString() + "\",\"badge\":\"1\",\"sound\":\"default.caf\"}"));
 
                             try
                             {
@@ -112,15 +137,18 @@ namespace sendNotification
                                 }
                                 catch (Exception ex2)
                                 {
+                                    Emails.Email.Enviarcorreo("Error envio de push Android BBVA", "info.rodolfoc@gmail.com", ex.Message.ToString(), "Error");
                                     Console.Write(ex2.Message);
                                 }
 
                             }
+                           // push.StopAllServices();
                             //i++;
                             //if (i % 500 == 0)
                             //{
-                            //    push.StopAllServices();
+                               push.StopAllServices();
                             //}
+                            actual = DateTime.Parse("01-01-0001 " + DateTime.Now.ToShortTimeString());
                             if (DateTime.Compare(actual, duration) > 0)
                             {
                                 break;
@@ -129,23 +157,22 @@ namespace sendNotification
                         push.StopAllServices();
                         System.Threading.Thread.Sleep(5000);
                     }
-                    conn.Close();
                 }
+                    conn.Close();
+                
 
             }
             catch (Exception ex)
             {
-
                 Console.Write(ex.Message);
+                Emails.Email.Enviarcorreo("Error envio de push Android BBVA", "info.rodolfoc@gmail.com", ex.Message.ToString(), "Error");
                 push.StopAllServices();
             }
 
 
-         
+
 
         }
-
-
 
         static void DeviceSubscriptionChanged(object sender, string oldSubscriptionId, string newSubscriptionId, INotification notification)
         {

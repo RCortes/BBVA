@@ -1,0 +1,15 @@
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Release\Connection_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Release\Connection_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Release\Data_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Release\Npgsql.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Release\PushSharp.Android.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Release\PushSharp.Apple.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Release\PushSharp.Core.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Release\Data_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Release\PushSharp.Android.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Release\PushSharp.Apple.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Release\PushSharp.Core.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\obj\Release\Connection_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\obj\Release\Connection_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\bin\Release\Mono.Security.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Connection_PushBBVA\obj\Release\Connection_PushBBVA.csprojResolveAssemblyReference.cache

@@ -25,15 +25,15 @@ namespace Connection_PushBBVA
         public static Status<Login> Login(string user, string pass)
         { 
             Status<Login> status = new Status<Login>();
+            SqlConnection conn = new SqlConnection(connectionString: conex);
             try{
+
                string sql = @"SELECT *
                                FROM Admin
-                               WHERE idAdmin = @usuario AND pass = @password ";
-
-          
+                               WHERE idAdmin = @usuario AND pass = @password ";         
             
                
-                SqlConnection conn = new SqlConnection(connectionString: conex);
+                conn = new SqlConnection(connectionString: conex);
                 conn.Open();
 
                 user = removeRut(user);
@@ -45,7 +45,7 @@ namespace Connection_PushBBVA
                 SqlDataAdapter daAdaptador = new SqlDataAdapter(command);
                 DataSet dtDatos = new DataSet();
                 daAdaptador.Fill(dtDatos);
-
+                conn.Close();
                 status.status = "Error";
                 status.description = "Access denied";
 
@@ -65,21 +65,31 @@ namespace Connection_PushBBVA
             {
                 status.status = "Error";
                 status.description = ex.Message;
+                conn.Close();
             }
-            return status;
-            
-        }
 
+            return status;
+           
+        }
         public static Status CreateUser(string rut, string firstName, string lastName, string idDevice, string idPlataform)
         {          
             Status status = new Status();
-
+            SqlConnection conn = new SqlConnection(connectionString: conex);
             rut = removeRut(rut);
+
+
+            if (lastName == "0" || firstName == "0")
+            {
+                lastName = firstName = "";
+            }
+
+
+
             try 
             {
                 string sqlCountUser = @"SELECT COUNT(*) FROM dbo.Users WHERE idUsers = @usuario";
 
-                SqlConnection conn = new SqlConnection(connectionString: conex);
+                conn = new SqlConnection(connectionString: conex);
                 SqlCommand command = new SqlCommand(sqlCountUser, conn);
                 command.Parameters.AddWithValue("@usuario", removeRut(rut));
                 
@@ -165,6 +175,7 @@ namespace Connection_PushBBVA
                             {
                                 status.status = "Error";
                                 status.description = ex.Message;
+                                conn.Close();
                             }
 
                         }
@@ -274,6 +285,7 @@ namespace Connection_PushBBVA
                             {
                                 status.status = "Error";
                                 status.description = ex.Message;
+                                conn.Close();
                             }
                         }
                     
@@ -380,6 +392,7 @@ namespace Connection_PushBBVA
                             {
                                 status.status = "Error";
                                 status.description = ex.Message;
+                                conn.Close();
                             }
                         }
                         else 
@@ -485,6 +498,7 @@ namespace Connection_PushBBVA
                             {
                                 status.status = "Error";
                                 status.description = ex.Message;
+                                conn.Close();
                             }
                         }                   
                 }
@@ -493,20 +507,22 @@ namespace Connection_PushBBVA
             {
                 status.status = "Error";
                 status.description = ex.Message;
+                conn.Close();
             }
 
             return status;
         }
-
         public static Status DeleteUser(string rut) 
         {
             Status status = new Status();
+            SqlConnection conn = new SqlConnection(connectionString: conex);
+               
             rut = removeRut(rut);
             try
             {
                 string selectDevice = @"SELECT D.idDevice FROM dbo.Device D, dbo.Users_Device DU WHERE D.idDevice = DU.idDevice AND DU.idUsers = @rut";
 
-                SqlConnection conn = new SqlConnection(connectionString: conex);
+                conn = new SqlConnection(connectionString: conex);
                 SqlCommand command = new SqlCommand(selectDevice, conn);
 
                 command.Parameters.AddWithValue("@rut", rut);
@@ -548,15 +564,17 @@ namespace Connection_PushBBVA
             {
                 status.status = "Error";
                 status.description = ex.Message;
+                conn.Close();
             }
 
             return status;
         }
-
         public static Status<List<Data_PushBBVA.Notification>> Notification(string rut, string idNotificationType, string Limit)
         {
             Status<List<Data_PushBBVA.Notification>> status = new Status<List<Data_PushBBVA.Notification>>();
             rut = removeRut(rut);
+            SqlConnection conn = new SqlConnection(connectionString: conex);
+               
             try
             {
                 string SelectNotification = "";
@@ -573,9 +591,8 @@ namespace Connection_PushBBVA
                                       FROM dbo.Historical H, dbo.Plataform P, dbo.Users U, dbo.Device D, dbo.NotificationType NT
                                       WHERE NT.idNotificationType = H.idNotificationType AND P.idPlataform = H.idPlataform AND  D.idDevice = H.idDevice AND U.idUsers = H.idUsers AND H.idUsers = @idUsers AND H.idNotificationType = @idNotificationType  ORDER BY H.delivery DESC";
                 }
-
-
-                SqlConnection conn = new SqlConnection(connectionString: conex);
+                
+                conn = new SqlConnection(connectionString: conex);
                 SqlCommand command = new SqlCommand(SelectNotification, conn);
 
                 command.Parameters.AddWithValue("@idUsers", rut);
@@ -608,28 +625,30 @@ namespace Connection_PushBBVA
                     Notifications.title = _dr[9].ToString();
                     Notifications.text = _dr[10].ToString();
                     Notifications.status = Boolean.Parse(_dr[11].ToString());
-                    
-
-
+                   
                     status.Data.Add(Notifications);
 
                 }
-                status.Data.Reverse();
+
                 status.status = "Success";
                 status.description = "List Notification";
+
             }
             catch (Exception ex) 
             {
                 status.status = "Error";
                 status.description = ex.Message;
+                conn.Close();
             }
             return status;
         }
 
+
+
         public static Status<List< Data_PushBBVA.Notification>> NotificationAll(string idNotificationType, string Limit)
         {
             Status<List<Data_PushBBVA.Notification>> status = new Status<List<Data_PushBBVA.Notification>>();
-
+            SqlConnection conn = new SqlConnection(connectionString: conex);
             try
             {
                 string SelectNotification = "";
@@ -648,7 +667,7 @@ namespace Connection_PushBBVA
                 }
 
 
-                SqlConnection conn = new SqlConnection(connectionString: conex);
+                conn = new SqlConnection(connectionString: conex);
                 SqlCommand command = new SqlCommand(SelectNotification, conn);
 
                 command.Parameters.AddWithValue("@Limit", int.Parse(Limit));
@@ -686,7 +705,7 @@ namespace Connection_PushBBVA
                     status.Data.Add(Notifications);
 
                 }
-                status.Data.Reverse();
+               // status.Data.Reverse();
                 status.status = "Success";
                 status.description = "List Notification";
             }
@@ -694,6 +713,7 @@ namespace Connection_PushBBVA
             {
                 status.status = "Error";
                 status.description = ex.Message;
+                conn.Close();
             }
             return status;
         }
@@ -702,12 +722,13 @@ namespace Connection_PushBBVA
         {
             Status status = new Status();
             rut = removeRut(rut);
+            SqlConnection conn = new SqlConnection(connectionString: conex);
             try
             {
 
                 string selectNotificationtype = @"SELECT status FROM dbo.NotificationType_Users WHERE idUsers = @idUsers AND idNotificationType = @idNotificationType";
 
-                SqlConnection conn = new SqlConnection(connectionString: conex);
+                 conn = new SqlConnection(connectionString: conex);
                 SqlCommand command = new SqlCommand(selectNotificationtype, conn);
 
                 command.Parameters.AddWithValue("@idUsers", rut);
@@ -751,6 +772,7 @@ namespace Connection_PushBBVA
             {
                 status.status = "Error";
                 status.description = ex.Message;
+                conn.Close();
             }
             return status;
 
@@ -762,12 +784,13 @@ namespace Connection_PushBBVA
             Status status = new Status();
             string text = base64ToText(update);
             DateTime time = Convert.ToDateTime(text);
+            SqlConnection conn = new SqlConnection(connectionString: conex);
             try
             {
 
                 string selectNotificationtype = @"UPDATE dbo.NotificationType SET start = @update WHERE idNotificationType = @idNotificationType";
 
-                SqlConnection conn = new SqlConnection(connectionString: conex);
+                conn = new SqlConnection(connectionString: conex);
                 SqlCommand command = new SqlCommand(selectNotificationtype, conn);
                 command.Parameters.AddWithValue("@idNotificationType", idNotificationType);
                 command.Parameters.AddWithValue("@update", text);
@@ -786,6 +809,7 @@ namespace Connection_PushBBVA
             {
                 status.status = "Error";
                 status.description = ex.Message;
+                conn.Close();
             }
             return status;
 
@@ -795,12 +819,13 @@ namespace Connection_PushBBVA
         public static Status readNotification(string idHistorical)
         {
             Status status = new Status();
+            SqlConnection conn = new SqlConnection(connectionString: conex);
             try
             {
 
                 string updateHistorical = @"UPDATE dbo.Historical SET status = @status WHERE idHistorical = @idHistorical";
 
-                SqlConnection conn = new SqlConnection(connectionString: conex);
+                conn = new SqlConnection(connectionString: conex);
                 SqlCommand command = new SqlCommand(updateHistorical, conn);
                 command.Parameters.AddWithValue("@status", 1);
                 command.Parameters.AddWithValue("@idHistorical", idHistorical);
@@ -819,6 +844,7 @@ namespace Connection_PushBBVA
             {
                 status.status = "Error";
                 status.description = ex.Message;
+                conn.Close();
             }
             return status;
 
@@ -829,13 +855,14 @@ namespace Connection_PushBBVA
         {
             Status<List<NotificationType>> status = new Status<List<NotificationType>>();
             rut = removeRut(rut);
+            SqlConnection conn = new SqlConnection(connectionString: conex);
             try
             {
 
-                string selectNotificationType = @"SELECT NT.idNotificationType, Nt.title, NTU.status, NT.start, NT.duration FROM dbo.NotificationType_Users NTU, dbo.NotificationType NT WHERE NT.idnotificationType = NTU.idNotificationType AND  NTU.idUsers = @idUsers";
+                string selectNotificationType = @"SELECT NT.idNotificationType, Nt.title, NTU.status, NT.start, NT.duration FROM dbo.NotificationType_Users NTU, dbo.NotificationType NT WHERE NT.idnotificationType = NTU.idNotificationType AND  NTU.idUsers = @idUsers ORDER BY NTU.idNotificationType ASC";
 
 
-                SqlConnection conn = new SqlConnection(connectionString: conex);
+                conn = new SqlConnection(connectionString: conex);
                 SqlCommand command = new SqlCommand(selectNotificationType, conn);
 
                 command.Parameters.AddWithValue("@idUsers", rut);
@@ -863,7 +890,7 @@ namespace Connection_PushBBVA
 
                     status.Data.Add(Type);
                 }
-                status.Data.Reverse();
+                //status.Data.Reverse();
                 status.status = "Success";
                 status.description = "Setting list";
             }
@@ -871,6 +898,7 @@ namespace Connection_PushBBVA
             {
                 status.status = "Error";
                 status.description = ex.Message;
+                conn.Close();
             }
 
             return status;
@@ -880,13 +908,14 @@ namespace Connection_PushBBVA
 
         static void Historical(string idNotificationType, string idUsers, string idDevice, string idPlataform, string shortText, string longText)
         {
+            SqlConnection conn = new SqlConnection(connectionString: conex);
             try
             {
                 string Insert = @" Insert into dbo.Historical (creation, delivery, idNotificationType, idUsers, idDevice, idPlataform, shortText, longText, status) 
                                Values ( GETDATE(), GETDATE(), @idNotificationType, @idUsers, @idDevice, @idPlataform, @shortText, @longText, 0)";
 
 
-                SqlConnection conn = new SqlConnection(connectionString: conex);
+                 conn = new SqlConnection(connectionString: conex);
                 SqlCommand command = new SqlCommand(Insert, conn);
                 command.Parameters.AddWithValue("@idNotificationType", idNotificationType);
                 command.Parameters.AddWithValue("@idUsers", idUsers);
@@ -901,13 +930,14 @@ namespace Connection_PushBBVA
             }
             catch (Exception ex)
             {
+                conn.Close();
             }
         }
 
         public static Status sendNotification(string rut, string idNotificationType, string shortText, string longText)
         {
             Status status = new Status();
-
+            SqlConnection conn = new SqlConnection(connectionString: conex);
             rut = removeRut(rut);
             try
             {
@@ -929,7 +959,7 @@ namespace Connection_PushBBVA
                                         WHERE D.status = 1  AND D.idDevice = UD.idDevice AND NTU.status = 1 AND NTU.idNotificationType = @idNotificationType AND NTU.idUsers = UD.idUsers AND UD.idUsers = @idUsers ";
 
                 
-                SqlConnection conn = new SqlConnection(connectionString: conex);
+                conn = new SqlConnection(connectionString: conex);
                 SqlCommand command = new SqlCommand(selectDevice, conn);
 
                 command.Parameters.AddWithValue("@idUsers", rut);
@@ -964,7 +994,7 @@ namespace Connection_PushBBVA
                             push.QueueNotification(new AppleNotification()
                                                        .ForDeviceToken(_dr[0].ToString())
                                                        .WithAlert(stext.ToString())
-                                                       .WithBadge(-1)
+                                                       .WithBadge(1)
                                                        .WithSound("sound.caf"));
                             push.StopAllServices();
                             status.status = "Success";
@@ -977,7 +1007,7 @@ namespace Connection_PushBBVA
                             push.RegisterGcmService(new GcmPushChannelSettings(appID));
 
                             push.QueueNotification(new GcmNotification().ForDeviceRegistrationId(_dr[0].ToString())
-                                                  .WithJson("{\"alert\":\"+ stext.ToString +\",\"badge\":7,\"sound\":\"sound.caf\"}"));
+                                                  .WithJson("{\"alert\":\""+ stext.ToString() +"\",\"badge\":1,\"sound\":\"sound.caf\"}"));
                             push.StopAllServices();
                             status.status = "Success";
                             status.description = "Send Android";
@@ -998,19 +1028,23 @@ namespace Connection_PushBBVA
             {
                 status.status = "Error";
                 status.description = ex.Message;
+                conn.Close();
             }
             return status;
         }
 
         void insertHistorical(string idNotificationType, string idUsers,string idDevice, string idPlataform,string shortText, string longText)
         {
+            SqlConnection conn = new SqlConnection(connectionString: conex);
+              
+
             try
             {
                 string Insert = @" Insert into dbo.Historical (creation, delivery, idNotificationType, idUsers, idDevice, idPlataform, shortText, longText, status) 
                                Values ( GETDATE(), GETDATE(), @idNotificationType, @idUsers, @idDevice, @idPlataform, @shortText, @longText, 0)";
 
 
-                SqlConnection conn = new SqlConnection(connectionString: conex);
+                conn = new SqlConnection(connectionString: conex);
                 SqlCommand command = new SqlCommand(Insert, conn);
                 command.Parameters.AddWithValue("@idNotificationType", idNotificationType);
                 command.Parameters.AddWithValue("@idUsers", idUsers);
@@ -1025,6 +1059,7 @@ namespace Connection_PushBBVA
             }
             catch (Exception ex)
             {
+                conn.Close();
             }
         }
 
@@ -1038,16 +1073,17 @@ namespace Connection_PushBBVA
 
             try
             {
-                string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ConfigurationManager.AppSettings["inputFile"]).ToString();
+                string file = Path.Combine(ConfigurationManager.AppSettings["writeDirectory"], ConfigurationManager.AppSettings["inputFile"]).ToString();
 
                 OleDbConnection con = new System.Data.OleDb.OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + file +";Mode=ReadWrite;Extended Properties=\"Excel 12.0 Xml;HDR=YES;IMEX=1\"");
                 con.Open();
                 DataSet dset = new DataSet();
-                OleDbDataAdapter dadp = new OleDbDataAdapter("SELECT * FROM [Hoja 1$]", con);
+                OleDbDataAdapter dadp = new OleDbDataAdapter("SELECT * FROM [Hoja1$]", con);
                 dadp.TableMappings.Add("tbl", "Table");
                 dadp.Fill(dset);
                 DataTable table = dset.Tables[0];
                 conn.Open();
+                con.Close();
                 for (int i = 0; i < table.Rows.Count; i++)
                 {
                     if (table.Rows[i][0].ToString() != "" && table.Rows[i][1].ToString() != "" && table.Rows[i][2].ToString() != "" && table.Rows[i][3].ToString() != "")
@@ -1056,12 +1092,12 @@ namespace Connection_PushBBVA
                         {
                             string user = table.Rows[i][0].ToString();
                             string type = table.Rows[i][1].ToString();
-                            string shortTecxt = table.Rows[i][3].ToString();
-                            string longText = table.Rows[i][4].ToString();
+                            string shortTecxt = table.Rows[i][2].ToString();
+                            string longText = table.Rows[i][3].ToString();
 
                             string selectDevice = @"SELECT D.idDevice, D.idPlataform 
-                        FROM dbo.Device D, dbo.Users_Device UD, dbo.NotificationType_Users NTU
-                        WHERE D.status = 1  AND D.idDevice = UD.idDevice AND NTU.status = 1 AND NTU.idNotificationType = @idNotificationType AND NTU.idUsers = UD.idUsers AND UD.idUsers = @idUsers ";
+                                                  FROM dbo.Device D, dbo.Users_Device UD, dbo.NotificationType_Users NTU
+                                                  WHERE D.status = 1  AND D.idDevice = UD.idDevice AND NTU.status = 1 AND NTU.idNotificationType = @idNotificationType AND NTU.idUsers = UD.idUsers AND UD.idUsers = @idUsers ";
 
                             command = new SqlCommand(selectDevice, conn);
                             command.Parameters.AddWithValue("@idUsers", user);
@@ -1119,12 +1155,16 @@ namespace Connection_PushBBVA
                                     x++;
                                     status.status = "Success";
                                     status.description = "Create file";
+
+                                    conn.Close();
                                 }
                                 catch (Exception ex2)
                                 {
 
                                     status.status = "Error";
                                     status.description = ex2.Message ;
+                                    con.Close();
+                                    conn.Close();
                                 }
                             }
                         }
@@ -1132,6 +1172,8 @@ namespace Connection_PushBBVA
                         {
                             status.status = "Error";
                             status.description =  ex.Message;
+                            conn.Close();
+                            con.Close();
                         }
                     }
                 
@@ -1149,6 +1191,7 @@ namespace Connection_PushBBVA
             {
                 status.status = "Error";
                 status.description = x.ToString() +" "+ ex.Message;
+                conn.Close();
             }
             return status;
 
@@ -1185,7 +1228,7 @@ namespace Connection_PushBBVA
                         Users =  "<tr><td>"+ user + "</td>";
                         try
                         {
-                            string Types = @"SELECT * FROM dbo.NotificationType_Users NTU, dbo.Users U WHERE NTU.idUsers = U.idUsers AND U.idUsers = @rut";
+                            string Types = @"SELECT * FROM dbo.NotificationType_Users NTU, dbo.Users U WHERE NTU.idUsers = U.idUsers AND  U.idUsers = @rut";
 
                             using (SqlConnection conn2 = new SqlConnection(connectionString: conex))
                             {
@@ -1224,7 +1267,7 @@ namespace Connection_PushBBVA
 
                         StreamWriter write;
 
-                        write = new StreamWriter(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ConfigurationManager.AppSettings["ftpFile"]));
+                        write = new StreamWriter(Path.Combine(ConfigurationManager.AppSettings["writeDirectory"], ConfigurationManager.AppSettings["writeFile"]));
 
 
                         write.WriteLine("<html><table>");
@@ -1286,6 +1329,11 @@ namespace Connection_PushBBVA
             return status;
         
         }
+
+
+
+
+
 
         static void DeviceSubscriptionChanged(object sender, string oldSubscriptionId, string newSubscriptionId, PushSharp.Core.INotification notification)
         {
@@ -1349,438 +1397,5 @@ namespace Connection_PushBBVA
             return rut;
         }
         
-        ///////// ANTIGUOS ///////////////
-
-
-//        public static bool Login(string user, string pass)
-//        {
-           
-//            string sql = @"SELECT COUNT(*)
-//                       FROM Admin
-//                       WHERE idAdmin = @usuario AND password = @password ";
-
-//            using (SqlConnection conn = new SqlConnection(connectionString: conex))
-//            {
-              
-//                    conn.Open();
-
-//                    SqlCommand command = new SqlCommand(sql, conn);
-//                    command.Parameters.AddWithValue("@usuario", user);
-//                    command.Parameters.AddWithValue("@password", pass);
-
-//                    int count = Convert.ToInt32(command.ExecuteScalar());
-
-//                    if (count == 0)
-//                        return false;
-//                    else
-//                        return true;
-
-//            }
-//        }
-
-//        public static Data_PushBBVA.Login Login2(string user, string pass)
-//        {
-
-//            string sql = @"SELECT *
-//                       FROM Admin
-//                       WHERE idAdmin = @usuario AND password = @password ";
-
-
-//            using (SqlConnection conn = new SqlConnection(connectionString: conex))
-//            {
-//                Data_PushBBVA.Login access = new Data_PushBBVA.Login();
-
-//                try
-//                {
-//                    SqlCommand command = new SqlCommand(sql, conn);
-
-//                    command.Parameters.AddWithValue("@usuario", user);
-//                    command.Parameters.AddWithValue("@password", pass);
-
-//                    conn.Open();
-
-//                    SqlDataAdapter daAdaptador = new SqlDataAdapter(command);
-//                    DataSet dtDatos = new DataSet();
-//                    daAdaptador.Fill(dtDatos);
-
-//                    foreach (DataRow _dr in dtDatos.Tables[0].Rows)
-//                    {
-//                        access.name = _dr["firtsName"].ToString() + " " + _dr["lastName"].ToString();
-//                        access.user = _dr["idAdmin"].ToString();
-//                        access.status = "Success";
-//                    }
-
-//                    return access;
-
-//                }
-//                catch (Exception ex)
-//                {
-//                    access.status = "Error";
-//                    return access;
-//                }
-
-//            }
-//        }
-
-//        public static List<Data_PushBBVA.NotificationType> NotificationType() 
-//        {
-
-//            List<Data_PushBBVA.NotificationType> Type = new List<Data_PushBBVA.NotificationType>();
-
-//            string sql = @"SELECT * FROM NotificationType";
-
-//            using (SqlConnection conn = new SqlConnection(connectionString: conex))
-//            {             
-//                try
-//                {
-//                    SqlCommand command = new SqlCommand(sql, conn);                   
-
-//                    conn.Open();
-
-//                    SqlDataAdapter daAdaptador = new SqlDataAdapter(command);
-//                    DataSet dtDatos = new DataSet();
-//                    daAdaptador.Fill(dtDatos);
-
-//                    foreach (DataRow _dr in dtDatos.Tables[0].Rows)
-//                    {
-//                        Data_PushBBVA.NotificationType types = new Data_PushBBVA.NotificationType();
-//                        types.idNotificationType = int.Parse(_dr["idNotificationType"].ToString());
-//                        types.description = _dr["description"].ToString();
-//                        types.text = _dr["text"].ToString();
-//                        Type.Add(types);
-//                    }
-
-//                    return Type;
-
-//                }
-//                catch (Exception ex)
-//                {
-                   
-//                    return Type;
-//                }
-
-//            }
-
-            
-//        }
-
-//        public static string createUser(string user, string idDevice, string plataform)
-//        {
-//            string status = "";
-//            string IdUser = "";
-//            string IdDevice = idDevice;
-//            string token = "";
-//            string plataforma = plataform;
-//            string firstName = "";
-//            string lastName = "";
-//            string appVersion = "1.0";
-//            string appId = "1.0";
-
-//            string sql = @"SELECT COUNT(*) FROM Users WHERE rut = @usuario";
-
-//            using (SqlConnection conn = new SqlConnection(connectionString: conex))
-//            {
-//                    SqlCommand command = new SqlCommand(sql, conn);
-//                    command.Parameters.AddWithValue("@usuario", user);
-//                    int count = 0;
-//                    conn.Open();
-//                    count = Convert.ToInt32(command.ExecuteScalar());
-
-//                    if (count == 0)
-//                    {                        
-//                            string createUser = @"INSERT INTO Users (firstName, lastName, rut, creation, status)
-//                                                 VALUES (@firstName, @lastName, @rut, @creation, @status)";
-
-//                            using (SqlConnection conn2 = new SqlConnection(connectionString: conex))
-//                            {
-//                                SqlCommand command2 = new SqlCommand(createUser, conn2);
-//                                command2.Parameters.AddWithValue("@firstName", firstName);
-//                                command2.Parameters.AddWithValue("@lastName", lastName);
-//                                command2.Parameters.AddWithValue("@rut", user);
-//                                command2.Parameters.AddWithValue("@creation", DateTime.Now);
-//                                command2.Parameters.AddWithValue("@status", 1);
-//                                conn2.Open();
-//                                command2.ExecuteScalar();
-//                            }
-
-//                            string selectUser = @"SELECT idUsers FROM Users WHERE rut = @rut";                          
-                          
-//                            using (SqlConnection conn3 = new SqlConnection(connectionString: conex))
-//                            {
-//                                SqlCommand command3 = new SqlCommand(selectUser, conn3);
-//                                command3.Parameters.AddWithValue("@rut", user);
-//                                conn3.Open();
-                            
-//                                SqlDataAdapter daAdaptador = new SqlDataAdapter(command3);
-//                                DataSet dtDatos = new DataSet();
-//                                daAdaptador.Fill(dtDatos);
-
-//                                foreach (DataRow _dr in dtDatos.Tables[0].Rows)
-//                                {
-//                                    IdUser = _dr["idUsers"].ToString();
-//                                }                              
-//                            }
-
-//                            string createDevice = @"INSERT INTO Device (idDevice, token, appVersion, creation, status, idPlataform)
-//                                                 VALUES (@idDevice, @token, @appVersion, @creation, @status, @idPlataform)";
-
-//                            using (SqlConnection conn4 = new SqlConnection(connectionString: conex))
-//                            {
-//                                SqlCommand command4 = new SqlCommand(createDevice, conn4);
-//                                command4.Parameters.AddWithValue("@idDevice", idDevice);
-//                                command4.Parameters.AddWithValue("@token", token);
-//                                command4.Parameters.AddWithValue("@appVersion", appVersion);
-//                                command4.Parameters.AddWithValue("@creation", DateTime.Now);
-//                                command4.Parameters.AddWithValue("@status", 1);
-//                                command4.Parameters.AddWithValue("@idPlataform", plataforma);
-//                                conn4.Open();
-//                                command4.ExecuteScalar();
-//                            }
-
-//                            string selectDevice = @"SELECT idDevice FROM Device WHERE token = @token";
-
-//                            using (SqlConnection conn5 = new SqlConnection(connectionString: conex))
-//                            {
-//                                SqlCommand command5 = new SqlCommand(selectDevice, conn5);
-//                                command5.Parameters.AddWithValue("@token", token);
-//                                conn5.Open();
-
-//                                SqlDataAdapter daAdaptador = new SqlDataAdapter(command5);
-//                                DataSet dtDatos = new DataSet();
-//                                daAdaptador.Fill(dtDatos);
-
-//                                foreach (DataRow _dr in dtDatos.Tables[0].Rows)
-//                                {
-//                                    IdDevice = _dr["idDevice"].ToString();
-//                                }
-//                            }
-
-//                            string create = @"INSERT INTO Users_Device (idUsers, idDevice)
-//                                                 VALUES (@idUsers, @idDevice)";
-
-//                            using (SqlConnection conn6 = new SqlConnection(connectionString: conex))
-//                            {
-//                                SqlCommand command6 = new SqlCommand(create, conn6);
-//                                command6.Parameters.AddWithValue("@idUsers", IdUser);
-//                                command6.Parameters.AddWithValue("@idDevice", IdDevice);                
-//                                conn6.Open();
-//                                command6.ExecuteScalar();
-//                            }
-                            
-//                            string selectNotification = @"SELECT idNotificationType FROM NotificationType";
-
-//                            using (SqlConnection conn7 = new SqlConnection(connectionString: conex))
-//                            {
-//                                SqlCommand command7 = new SqlCommand(selectNotification, conn7);
-//                                conn7.Open();
-
-//                                SqlDataAdapter daAdaptador = new SqlDataAdapter(command7);
-//                                DataSet dtDatos = new DataSet();
-//                                daAdaptador.Fill(dtDatos);
-
-//                                foreach (DataRow _dr in dtDatos.Tables[0].Rows)
-//                                {
-                                    
-//                                    string create2 = @"INSERT INTO NotificationType_Users (idUsers, idNotificationType, status)
-//                                                 VALUES (@idUser, @idNotificatioType, @status)";
-
-//                                    using (SqlConnection conn8 = new SqlConnection(connectionString: conex))
-//                                    {
-//                                        SqlCommand command8 = new SqlCommand(create2, conn8);
-//                                        command8.Parameters.AddWithValue("@idUser", IdUser);
-//                                        command8.Parameters.AddWithValue("@idNotificatioType", _dr["idNotificationType"].ToString());
-//                                        command8.Parameters.AddWithValue("@status", 1);
-//                                        conn8.Open();
-//                                        command8.ExecuteScalar();
-//                                    }
-//                                }
-//                            }
-//                            status = "Success";
-//                    }
-//                    else 
-//                    {
-//                        status = "Error";
-//                    }
-             
-
-//            }
-
-//            return status;
-        
-//        }
-
-//        public static List<Data_PushBBVA.Notification> List(string rut, string type){
-
-
-//            string sql = @"SELECT N.idNotification, N.status, NT.idNotificationType ,  N.creation, N.delivery, U.firstName, U.lastName, U.rut, NT.title, NT.text, D.token, P.description 
-//                            FROM dbo.Notification N, dbo.Users U, dbo.NotificationType NT, dbo.Device D, dbo.Plataform P
-//                            WHERE P.idPlataform = D.idPlataform  AND D.idDevice = N.idDevice AND NT.idNotificationType = N.idNotificationType AND N.status = @type AND N.idUser = U.idUser AND U.rut = @rut"; 
-            
-
-//             using (SqlConnection conn = new SqlConnection(connectionString: conex))
-//             {
-                 
-               
-
-//                    List<Data_PushBBVA.Notification> notification = new List<Data_PushBBVA.Notification>();
-
-//                     SqlCommand command = new SqlCommand(sql, conn);
-
-//                     command.Parameters.AddWithValue("@rut", rut);
-//                     command.Parameters.AddWithValue("@type", type);
-
-//                     conn.Open();
-
-//                     SqlDataAdapter daAdaptador = new SqlDataAdapter(command);
-//                     DataSet dtDatos = new DataSet();
-//                     daAdaptador.Fill(dtDatos);
-
-//                     foreach (DataRow _dr in dtDatos.Tables[0].Rows)
-//                     {
-//                         Data_PushBBVA.Notification Notifi = new Data_PushBBVA.Notification();
-//                         Notifi.idNotification = int.Parse(_dr[0].ToString());
-//                         Notifi.name = _dr[5].ToString() + " " + _dr[6].ToString();
-//                         Notifi.create = DateTime.Parse(_dr[3].ToString());
-//                         Notifi.delivery = DateTime.Parse(_dr[4].ToString());
-//                         Notifi.tipo = _dr[2].ToString();
-//                         Notifi.rut = _dr[7].ToString();
-//                         Notifi.text = _dr[9].ToString();
-//                         Notifi.title = _dr[8].ToString();
-//                        // Notifi.token = _dr[10].ToString();
-//                         Notifi.plataform = _dr[11].ToString();
-
-
-//                         notification.Add(Notifi);
-//                     }
-
-
-//                     return notification;
-                 
-//             }
-
-        
-        
-//        }
-
-//        public static List<Data_PushBBVA.Notification> ListNotification(string type){
-
-
-//            string sql = @"SELECT N.idNotification, N.status, NT.idNotificationType ,  N.creation, N.delivery, U.firstName, U.lastName, U.rut, NT.title, NT.text, D.token, P.description 
-//                            FROM dbo.Notification N, dbo.Users U, dbo.NotificationType NT, dbo.Device D, dbo.Plataform P
-//                            WHERE P.idPlataform = D.idPlataform  AND D.idDevice = N.idDevice AND NT.idNotificationType = N.idNotificationType AND N.idUser = U.idUser AND N.status = @type"; 
-           
-
-//             using (SqlConnection conn = new SqlConnection(connectionString: conex))
-//             {
-                 
-               
-
-//                    List<Data_PushBBVA.Notification> notification = new List<Data_PushBBVA.Notification>();
-
-//                     SqlCommand command = new SqlCommand(sql, conn);
-
-                   
-//                     command.Parameters.AddWithValue("@type", type);
-
-//                     conn.Open();
-
-//                     SqlDataAdapter daAdaptador = new SqlDataAdapter(command);
-//                     DataSet dtDatos = new DataSet();
-//                     daAdaptador.Fill(dtDatos);
-
-//                     foreach (DataRow _dr in dtDatos.Tables[0].Rows)
-//                     {
-//                         Data_PushBBVA.Notification Notifi = new Data_PushBBVA.Notification();
-//                         Notifi.idNotification = int.Parse(_dr[0].ToString());
-//                         Notifi.name = _dr[5].ToString() + " " + _dr[6].ToString();
-//                         Notifi.create = DateTime.Parse(_dr[3].ToString());
-//                         Notifi.delivery = DateTime.Parse(_dr[4].ToString());
-//                         Notifi.tipo = _dr[2].ToString();
-//                         Notifi.rut = _dr[7].ToString();
-//                         Notifi.text = _dr[9].ToString();
-//                         Notifi.title = _dr[8].ToString();
-//                         //Notifi.token = _dr[10].ToString();
-//                         Notifi.plataform = _dr[11].ToString();
-
-
-//                         notification.Add(Notifi);
-//                     }
-
-
-//                     return notification;
-                 
-//             }
-
-        
-        
-//        }
-
-//        public static string UpdateDevice(string idDevice, string token) {
-
-//            string createUser = @"UPDATE dbo.Device SET token = @token WHERE idDevice = @idDevice";
-//            try
-//            {
-//                using (SqlConnection conn = new SqlConnection(connectionString: conex))
-//                {
-//                    SqlCommand command = new SqlCommand(createUser, conn);
-//                    command.Parameters.AddWithValue("@idDevice", idDevice);
-//                    command.Parameters.AddWithValue("@token", token);
-//                    conn.Open();
-//                    command.ExecuteScalar();
-
-//                    return "Success";
-//                }
-//            }
-//            catch (Exception ex)
-//            {
-//                return "Error";
-//            }
-            
-//        }
-
-//        public static List<Data_PushBBVA.NotificationUser> ListSetting(string rut) {
-
-
-//            string sql = @"SELECT NTU.status, NT.title, NT.idNotificationType
-//FROM dbo.Users U, dbo.NotificationType NT, dbo.User_NotificationType NTU
-//WHERE NT.idNotificationType = NTU.idNotificationType AND NTU.idUser = U.idUser AND U.rut = @rut";
-
-
-//            using (SqlConnection conn = new SqlConnection(connectionString: conex))
-//            {
-
-
-
-//                List<Data_PushBBVA.NotificationUser> Setting = new List<Data_PushBBVA.NotificationUser>();
-
-//                SqlCommand command = new SqlCommand(sql, conn);
-
-
-//                command.Parameters.AddWithValue("@rut", rut);
-
-//                conn.Open();
-
-//                SqlDataAdapter daAdaptador = new SqlDataAdapter(command);
-//                DataSet dtDatos = new DataSet();
-//                daAdaptador.Fill(dtDatos);
-
-//                foreach (DataRow _dr in dtDatos.Tables[0].Rows)
-//                {
-//                    Data_PushBBVA.NotificationUser setting = new Data_PushBBVA.NotificationUser();
-//                    setting.status = _dr[0].ToString();
-//                    setting.title = _dr[1].ToString();
-//                    setting.idNotificationType = int.Parse(_dr[2].ToString());
-//                    Setting.Add(setting);
-//                }
-
-
-//                return Setting;
-
-//            }
-
-        
-        
-//        }
-      
     }
 }

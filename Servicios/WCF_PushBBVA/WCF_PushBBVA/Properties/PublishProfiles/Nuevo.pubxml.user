@@ -11,10 +11,25 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
   </PropertyGroup>
   <ItemGroup>
     <File Include="bin/Connection_PushBBVA.dll">
-      <publishTime>05/30/2014 16:38:11</publishTime>
+      <publishTime>05/06/2014 15:36:29</publishTime>
     </File>
     <File Include="bin/Data_PushBBVA.dll">
-      <publishTime>05/28/2014 01:13:28</publishTime>
+      <publishTime>05/06/2014 15:36:33</publishTime>
+    </File>
+    <File Include="bin/de/Npgsql.resources.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
+    </File>
+    <File Include="bin/es/Npgsql.resources.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
+    </File>
+    <File Include="bin/fi/Npgsql.resources.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
+    </File>
+    <File Include="bin/fr/Npgsql.resources.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
+    </File>
+    <File Include="bin/ja/Npgsql.resources.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
     </File>
     <File Include="bin/Mono.Security.dll">
       <publishTime>05/03/2013 11:17:54</publishTime>
@@ -35,13 +50,16 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
       <publishTime>04/27/2014 17:26:42</publishTime>
     </File>
     <File Include="bin/WCF_PushBBVA.dll">
-      <publishTime>05/30/2014 16:38:24</publishTime>
+      <publishTime>06/05/2014 17:19:39</publishTime>
+    </File>
+    <File Include="bin/zh-CN/Npgsql.resources.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
     </File>
     <File Include="Service1.svc">
       <publishTime>04/18/2014 22:57:13</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>05/29/2014 12:33:41</publishTime>
+      <publishTime>06/05/2014 17:19:56</publishTime>
     </File>
   </ItemGroup>
 </Project>

@@ -1,0 +1,14 @@
+Z:\Github\BBVA\Console\ReadNotifications\ReadNotifications\bin\Debug\ReadNotifications.exe
+Z:\Github\BBVA\Console\ReadNotifications\ReadNotifications\bin\Debug\ReadNotifications.pdb
+Z:\Github\BBVA\Console\ReadNotifications\ReadNotifications\obj\Debug\ReadNotifications.exe
+Z:\Github\BBVA\Console\ReadNotifications\ReadNotifications\obj\Debug\ReadNotifications.pdb
+Z:\Github\BBVA\Console\ReadNotifications\ReadNotifications\obj\Debug\ReadNotifications.csprojResolveAssemblyReference.cache
+Z:\Github\BBVA\Console\ReadNotifications\ReadNotifications\bin\Debug\ReadNotifications.exe.config
+Z:\Github\Actualizacion\Consola\ReadNotifications\ReadNotifications\bin\Debug\ReadNotifications.exe.config
+\\psf\Home\Github\Actualizacion\Consola\ReadNotifications\ReadNotifications\bin\Debug\ReadNotifications.exe.config
+\\psf\Home\Github\Actualizacion\Consola\ReadNotifications\ReadNotifications\bin\Debug\ReadNotifications.exe
+\\psf\Home\Github\Actualizacion\Consola\ReadNotifications\ReadNotifications\bin\Debug\ReadNotifications.pdb
+\\psf\Home\Github\Actualizacion\Consola\ReadNotifications\ReadNotifications\bin\Debug\libEmailSpartacus.dll
+\\psf\Home\Github\Actualizacion\Consola\ReadNotifications\ReadNotifications\bin\Debug\libEmailSpartacus.pdb
+\\psf\Home\Github\Actualizacion\Consola\ReadNotifications\ReadNotifications\obj\Debug\ReadNotifications.exe
+\\psf\Home\Github\Actualizacion\Consola\ReadNotifications\ReadNotifications\obj\Debug\ReadNotifications.pdb

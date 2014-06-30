@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+Este archivo es utilizado por el proceso de paquete/publicación de nuestro proyecto Web. Puede personalizar el comportamiento de este proceso
+editando este archivo MSBuild. Para conocer más acerca de esto, visite http://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="bin/Connection_PushBBVA.dll">
+      <publishTime>06/18/2014 01:36:56</publishTime>
+    </File>
+    <File Include="bin/Data_PushBBVA.dll">
+      <publishTime>06/05/2014 15:36:33</publishTime>
+    </File>
+    <File Include="bin/Mono.Security.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
+    </File>
+    <File Include="bin/Newtonsoft.Json.dll">
+      <publishTime>05/22/2014 12:17:53</publishTime>
+    </File>
+    <File Include="bin/Npgsql.dll">
+      <publishTime>05/03/2013 11:17:54</publishTime>
+    </File>
+    <File Include="bin/PushSharp.Android.dll">
+      <publishTime>05/22/2014 12:37:38</publishTime>
+    </File>
+    <File Include="bin/PushSharp.Apple.dll">
+      <publishTime>05/22/2014 12:34:20</publishTime>
+    </File>
+    <File Include="bin/PushSharp.Core.dll">
+      <publishTime>06/12/2014 16:58:52</publishTime>
+    </File>
+    <File Include="bin/WCF_PushBBVA.dll">
+      <publishTime>06/18/2014 01:37:28</publishTime>
+    </File>
+    <File Include="packages.config">
+      <publishTime>06/15/2014 17:30:42</publishTime>
+    </File>
+    <File Include="Service1.svc">
+      <publishTime>04/18/2014 22:57:13</publishTime>
+    </File>
+    <File Include="Web.config">
+      <publishTime>06/18/2014 01:37:28</publishTime>
+    </File>
+  </ItemGroup>
+</Project>

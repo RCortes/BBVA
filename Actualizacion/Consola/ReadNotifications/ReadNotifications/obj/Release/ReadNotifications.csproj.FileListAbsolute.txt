@@ -1,0 +1,12 @@
+Z:\Github\BBVA\Console\ReadNotifications\ReadNotifications\bin\Release\ReadNotifications.exe.config
+Z:\Github\BBVA\Console\ReadNotifications\ReadNotifications\bin\Release\ReadNotifications.exe
+Z:\Github\BBVA\Console\ReadNotifications\ReadNotifications\bin\Release\ReadNotifications.pdb
+Z:\Github\BBVA\Console\ReadNotifications\ReadNotifications\obj\Release\ReadNotifications.exe
+Z:\Github\BBVA\Console\ReadNotifications\ReadNotifications\obj\Release\ReadNotifications.pdb
+Z:\Github\Actualizacion\Consola\ReadNotifications\ReadNotifications\bin\Release\ReadNotifications.exe.config
+Z:\Github\Actualizacion\Consola\ReadNotifications\ReadNotifications\bin\Release\ReadNotifications.exe
+Z:\Github\Actualizacion\Consola\ReadNotifications\ReadNotifications\bin\Release\ReadNotifications.pdb
+Z:\Github\Actualizacion\Consola\ReadNotifications\ReadNotifications\bin\Release\libEmailSpartacus.dll
+Z:\Github\Actualizacion\Consola\ReadNotifications\ReadNotifications\bin\Release\libEmailSpartacus.pdb
+Z:\Github\Actualizacion\Consola\ReadNotifications\ReadNotifications\obj\Release\ReadNotifications.exe
+Z:\Github\Actualizacion\Consola\ReadNotifications\ReadNotifications\obj\Release\ReadNotifications.pdb

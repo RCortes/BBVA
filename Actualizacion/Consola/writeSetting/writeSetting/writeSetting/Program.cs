@@ -1,0 +1,179 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Configuration;
+using System.Diagnostics;
+
+namespace writeSetting
+{
+    class Program
+    {
+        public static string conex = ConfigurationManager.ConnectionStrings["DB"].ConnectionString;
+
+        static void Main(string[] args)
+        {
+
+
+
+            Process[] localAll = Process.GetProcesses();
+            int p = 1;
+            foreach (Process pr in localAll)
+            {
+                if (pr.ProcessName == "writeSetting")
+                {
+                    if (p > 1)
+                    {
+                        Console.Write("\n\n\n \"writeSetting.exe\" ya esta en ejecución... será cerrada");
+                        System.Threading.Thread.Sleep(3000);
+                        Environment.Exit(0);
+                    }
+                    p++;
+                }
+            }
+
+
+            Console.Write("\n------------------------------------------------");
+            Console.Write("\n  User configuration Updater (please do not close)");
+            Console.Write("\n------------------------------------------------");
+            Console.Write("\n\n  - Reading user data...");
+            
+            string Users = "";
+            int i = 0;
+
+            List<string> User = new List<string>();
+
+            string users = @"Select idUsers FROM dbo.Users WHERE status = 1";
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString: conex))
+                {
+
+                    SqlCommand command = new SqlCommand(users, conn);
+                   // conn.Open();
+                    SqlDataAdapter daAdaptador = new SqlDataAdapter(command);
+                    DataSet dtDatos = new DataSet();
+                    daAdaptador.Fill(dtDatos);
+
+
+                    foreach (DataRow _dr in dtDatos.Tables[0].Rows)
+                    {
+                        
+                        string user = _dr[0].ToString();
+
+                        Users = user + ";";
+                        try
+                        {
+                            string Types = @"SELECT * FROM dbo.NotificationType_Users NTU, dbo.Users U WHERE NTU.idUsers = U.idUsers AND U.idUsers = @rut";
+
+                            using (SqlConnection conn2 = new SqlConnection(connectionString: conex))
+                            {
+                                SqlCommand command2 = new SqlCommand(Types, conn2);
+                                command2.Parameters.AddWithValue("@rut", user);
+                                //conn2.Open();
+                                SqlDataAdapter daAdaptador2 = new SqlDataAdapter(command2);
+                                DataSet dtDatos2 = new DataSet();
+                                daAdaptador2.Fill(dtDatos2);
+                                foreach (DataRow _dr2 in dtDatos2.Tables[0].Rows)
+                                {
+                                    if (_dr2[2].ToString() == "True")
+                                    {
+                                        Users += 1 + ";";
+                                    }
+                                    else
+                                    {
+                                        Users += 0 + ";";
+                                    }
+                                }
+                            }
+
+                        }
+                        catch (Exception ex)
+                        {
+                            
+                        }
+
+                        User.Add(Users);
+
+                    }
+
+                    Console.Write(" OK");
+
+                    try
+                    {
+                        Console.Write("\n  - Writing file...");
+
+                        List<string> reads = new List<string>();
+
+                        StreamWriter write;
+                        
+                        write = new StreamWriter(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ConfigurationManager.AppSettings["ftpFile"]));
+
+                        for (i = 0; i <= User.Count - 1; i++)
+                        {
+                            try
+                            {
+                                write.WriteLine(User[i]);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.Write("\n Error de escritura: " + ex.Message );                       
+                            }
+                        }
+                        write.Close();
+                        Console.Write(" OK");
+
+                        Console.Write("\n  - Loading in FTP...");
+                        FtpWebRequest request = (FtpWebRequest)FtpWebRequest.Create(ConfigurationManager.AppSettings["ftpRoute"] + ConfigurationManager.AppSettings["ftpFile"]);
+                        request.Method = WebRequestMethods.Ftp.UploadFile;
+                        request.Credentials = new NetworkCredential(ConfigurationManager.AppSettings["ftpUser"], ConfigurationManager.AppSettings["ftpPass"]);
+                        request.UsePassive = true;
+                        request.KeepAlive = true;
+
+                        FileStream stream = File.OpenRead(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ConfigurationManager.AppSettings["ftpFile"]));
+
+                        byte[] buffer = new byte[stream.Length];
+                        stream.Read(buffer, 0, buffer.Length);
+                        stream.Close();
+
+                        Stream reqStream = request.GetRequestStream();
+                        reqStream.Write(buffer, 0, buffer.Length);
+                        reqStream.Flush();
+                        reqStream.Close();
+                        Console.Write(" OK");
+                        Console.Write("\n\n------------------------------------------------\n\n\n");
+                        Console.Write("\n\n\n Status: Success");
+                        System.Threading.Thread.Sleep(7000);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Write("\n\n Error " + ex.Message);
+                        System.Threading.Thread.Sleep(7000);
+                        Environment.Exit(0);
+                        Emails.Email.Enviarcorreo("Error writeSetting BBVA", "info.rodolfoc@gmail.com", ex.Message, "Error");
+                    }
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.Write("\n\n Error " + ex.Message);
+                Emails.Email.Enviarcorreo("Error writeSetting BBVA", "info.rodolfoc@gmail.com", ex.Message, "Error");
+                 
+                System.Threading.Thread.Sleep(7000);
+                Environment.Exit(0);
+            }
+
+                
+        
+        }
+    }
+}

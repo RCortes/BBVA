@@ -44,18 +44,17 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>Z:\Respaldo\Documentos\wcfNunchee - VCM\NuncheeConnection\bin\Release\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Npgsql, Version=2.0.11.91, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>W:\Respaldo\Documentos\wcfNunchee - VCM\NuncheeConnection\bin\Release\Npgsql.dll</HintPath>
+    <Reference Include="Npgsql">
+      <HintPath>\\psf\Home\Github\Mediaroom\AULA365\Bin\Npgsql.dll</HintPath>
     </Reference>
     <Reference Include="PushSharp.Android">
-      <HintPath>..\..\..\..\..\Notificacio\Notificaciones BBVA\Console\Push_Notification\Push_Notification\bin\Debug\PushSharp.Android.dll</HintPath>
+      <HintPath>\\psf\Home\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\PushSharp.Android.dll</HintPath>
     </Reference>
     <Reference Include="PushSharp.Apple">
-      <HintPath>..\..\..\..\..\Notificacio\Notificaciones BBVA\Console\Push_Notification\Push_Notification\bin\Debug\PushSharp.Apple.dll</HintPath>
+      <HintPath>\\psf\Home\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\PushSharp.Apple.dll</HintPath>
     </Reference>
     <Reference Include="PushSharp.Core">
-      <HintPath>..\..\..\..\..\Notificacio\Notificaciones BBVA\Console\Push_Notification\Push_Notification\bin\Debug\PushSharp.Core.dll</HintPath>
+      <HintPath>\\psf\Home\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\PushSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />

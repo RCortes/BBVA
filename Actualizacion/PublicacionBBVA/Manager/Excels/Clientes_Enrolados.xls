@@ -1,0 +1,2888 @@
+<?php
+
+include_once 'controllers/Android_GCM.php';
+require_once 'controllers/ApnsPHP/Autoload.php';
+
+class SendNotification {
+    public function __construct() {
+    }
+
+    public function sendAndroid($deviceTokens, $metadata, $title) {
+
+        $gcm = new AndroidGCM("AIzaSyBbsQnPByBI484hHMLOC_FRLowkIKqlWO0");
+           
+        $metadata['message'] = $title;
+
+        //Se envía a todos los usuarios Android
+        if (count($deviceTokens) > 0) {
+            $gcm -> setDevices($deviceTokens);
+            $gcm -> setData($metadata);
+            //enviamos los mensajes
+            $gcm -> sendPushMessages();
+
+            $userCalculations = new UserCalculations();
+            $userCalculations->updateUserTokens($gcm, $deviceTokens);          
+        }
+
+    }
+
+    public function sendIOS($deviceTokens, $message) {
+
+        $push = new ApnsPHP_Push(ApnsPHP_Abstract::ENVIRONMENT_SANDBOX, 'apn-dev-cert.pem');
+        $push -> connect();
+
+        foreach ($deviceTokens as $token) {
+            $message -> addRecipient($token);
+        }
+
+        //Add the message to the message queue
+        $push -> add($message);
+
+        //Send all messages in the message queue
+        //$push -> send();
+
+        //Disconnect from the Apple Push Notification Service
+        $push -> disconnect();
+    }
+}
+
+class DeviceNotification{
+
+    private $deviceToken;
+    private $alert;
+    private $badge;
+    private $sound;
+    private $local_cert;
+    private $passphrase;
+    private $fp;
+
+    public function __construct($local_cert =  "apn-dev-cert.pem", $passphrase = ""){
+        $this->local_cert = $local_cert;
+        $this->passphrase = $passphrase;
+    }
+
+    public function connect(){
+        $ctx = stream_context_create();
+        stream_context_set_option($ctx, 'ssl', 'local_cert', $this->local_cert);
+        stream_context_set_option($ctx, 'ssl', 'passphrase', $this->passphrase);
+
+        // Open a connection to the APNS server
+       $this->fp = stream_socket_client(
+            'ssl://gateway.sandbox.push.apple.com:2195', $err,
+            $errstr, 60, STREAM_CLIENT_CONNECT|STREAM_CLIENT_PERSISTENT, $ctx);
+
+        return $this->fp;
+    }
+
+    public function disconnect(){
+        // Close the connection to the server
+        fclose($this->fp);
+    }
+
+    public function send($deviceToken, $alert, $metadata, $badge = -1, $sound = "Default", $type = 'ios', $message = null){
+        
+        // Create the payload body
+        $body['aps'] = array(
+            'alert' => $alert,
+            'badge' => $badge,
+            'sound' => $sound
+        );
+        $body['metadata'] = $metadata;
+
+        // Encode the payload as JSON
+        $payload = json_encode($body);
+
+       if($type != 'android'){
+
+            //$push = new ApnsPHP_Push(ApnsPHP_Abstract::ENVIRONMENT_SANDBOX, 'apn-dev-cert.pem');
+            //$push -> connect();
+
+            // Add the message to the message queue
+            //$push -> add($message);
+
+            // Send all messages in the message queue
+            //$push -> send();
+
+            // Disconnect from the Apple Push Notification Service
+            //$push -> disconnect();
+
+            // Examine the error message container
+            // $aErrorQueue = $push -> getErrors();
+            // if (!empty($aErrorQueue)) {
+            //     var_dump($aErrorQueue);
+            // }
+
+            
+            // Build the binary notification
+            $msg = chr(0) . chr(0) . chr(32) . pack('H*', $deviceToken) . chr(0) . chr(strlen($payload)) . $payload;            
+
+            // Send it to the server
+            try {
+                $result = fwrite($this->fp, $msg, strlen($msg));
+            } catch(Exception $e) {
+                echo $e;
+            }
+            
+        }else{
+            //we create an object to handle the Android notifications
+            $gcm = new AndroidGCM("AIzaSyBbsQnPByBI484hHMLOC_FRLowkIKqlWO0");
+           
+            $metadata['message'] = $alert;
+
+            $payload = json_encode($metadata);
+
+            //Se envía a todos los usuarios Android
+            if (count($deviceToken) > 0) {
+                $gcm -> setDevices($deviceToken);
+                $gcm -> setData($metadata);
+                //enviamos los mensajes
+                $gcm -> sendPushMessages();
+
+                //TODO FALTA VERIFICAR REG ID CADUCADOS Y NULOS. CON ESTOS HAY QUE ACTUALIZAR O BORRAR DE LA BD
+                $userCalculations = new UserCalculations();
+                $userCalculations->updateUserTokens($gcm, $deviceToken);                
+            }
+        }
+        /*if (!$result)
+            echo 'Message not delivered' . PHP_EOL;
+        else
+        {
+            echo 'Message successfully delivered' . PHP_EOL;
+            echo decbin($result);
+            echo PHP_EOL;
+        }*/
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Application Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register all of the routes for an application.
+| It's a breeze. Simply tell Laravel the URIs it should respond to
+| and give it the Closure to execute when that URI is requested.
+|
+*/
+
+/*Route::get('/', function()
+{
+    return View::make('hello');
+});*/
+
+Route::get('/', array('as' => 'home', function () {
+    $matches = Match::all();
+    $matches->load('teams', 'match_state');
+    $match_quantity = Match::all()->count();
+    $matches_already_played = Match::where('match_state_id', '>', 2)->count();
+    $user_quantity = User::all()->count();
+    $incidence_quantity = Incidence::all()->count();
+    //return Response::json($matches);
+
+    return View::make('home')->with(array(
+        'matches' => $matches, 
+        'match_quantity' => $match_quantity, 
+        'matches_already_played' => $matches_already_played,
+        'user_quantity' => $user_quantity, 
+        'incidence_quantity' => $incidence_quantity
+    ));
+}))->before('auth');
+
+Route::get('login', array('as' => 'login', function () {
+    return View::make('login');
+}))->before('guest');
+
+Route::post('login', function () {
+    $user = array(
+            'email' => Input::get('username'),
+            'password' => Input::get('password')
+        );
+        
+        if (Auth::attempt($user)) {
+            return Redirect::route('home')
+                ->with('message', 'You are successfully logged in.');
+        }
+        
+        // authentication failure! lets go back to the login page
+        return Redirect::route('login')
+            ->with('message', 'Tu usuario o contraseña es incorrecta')
+            ->withInput();
+});
+
+Route::get('logout', array('as' => 'logout', function () {
+    Auth::logout();
+    return Redirect::route('login')
+        ->with('message', 'Adiós!');
+}))->before('auth');
+
+Route::get('ms', function(){
+    $b = new Benchmark();
+    $b->start();
+    for ($i=0; $i < 100000000; $i++) { 
+
+    }
+    $elapsed = $b->end();
+    return Response::json(array('elapsed' => $elapsed, 'log' => $b->log()));
+});
+
+/*Route::get('match_start/{match_id}', function($match_id){
+    $match = Match::find($match_id);
+    $match->match_state_id = 2;
+    $match->begin_at = date('Y-m-d H:i:s');
+    $match->save();
+    $match->load('teams');
+    $dn = new DeviceNotification();
+    $alert = 'El partido de ' . $match->teams[0]->name . ' vs ' . $match->teams[1]->name . ' esta por comenzar';
+    $metadata = array(
+        'type_id' => 1,
+        'match_id' => $match_id
+    );
+    $devices = Device::all();
+    foreach ($devices as $device) {
+        $notification = new Notification();
+        $notification->sent_at = date('Y-m-d H:i:s');
+        $notification->message = $alert;
+        $notification->some_id = $match_id;
+        $notification->user_id = $device->user_id;
+        $notification->save();
+        $metadata['server_time'] = $notification->sent_at;
+        $metadata['notification_id'] = $notification->id;
+        $dn->send($device->token, $alert, $metadata);
+    }
+    return Redirect::to('match/' . $match_id);
+});*/
+
+Route::get('match/{match_id}', array('as' => 'match', function($match_id){
+    $match = Match::find($match_id);
+
+    $match->load('teams');
+    $match_next_status_id = $match->match_state_id + 1;
+    $match_next_status_text = '';
+    $match_next_status_text .= $match->match_state_id == 1 ? 'Inicio de Partido' : '';
+    $match_next_status_text .= $match->match_state_id == 2 ? 'Fin de Primer Tiempo' : '';
+    $match_next_status_text .= $match->match_state_id == 3 ? 'Inicio Segundo Tiempo' : '';
+    $match_next_status_text .= $match->match_state_id == 4 ? 'Fin de Segundo Tiempo' : '';
+    $match_next_status_text .= $match->match_state_id == 5 ? 'Iniciar de Primer Alargue' : '';
+    $match_next_status_text .= $match->match_state_id == 6 ? 'Fin de Primer Alargue' : '';
+    $match_next_status_text .= $match->match_state_id == 7 ? 'Inicio de Segundo Alargue' : '';
+    $match_next_status_text .= $match->match_state_id == 8 ? 'Fin de Segundo Alargue' : '';
+    $match_next_status_text .= $match->match_state_id == 9 ? 'Penales' : '';
+    $match_next_status_text .= $match->match_state_id == 10 ? 'Fin Penales' : '';
+    $match_next_status_text .= $match->match_state_id == 11 ? 'Fin Partido' : '';
+    
+    return View::make('match')->with(array(
+        'match' => $match,
+        'match_next_status_id' => $match_next_status_id,
+        'match_next_status_text' => $match_next_status_text
+        ));
+
+}))->before('auth');
+
+/*Route::get('new_device/{token}', function($token){
+    $input = array('token' => $token);
+    $validation = Validator::make($input, Device::$rules);
+    if($validation->passes())
+        Device::create($input);
+});*/
+Route::get('pass/', function(){
+    
+
+$pass=Hash::make('dcuello');
+if (Hash::check('secret', $pass))
+{
+  echo 'rehash';
+}
+return Response::json($pass);
+});
+
+
+Route::get('match_score_up/{match_id}/{team_id}', function($match_id, $team_id){
+    $team_in_match = Team_in_match::whereRaw('match_id = ' . $match_id . ' and team_id = ' . $team_id)->first();
+    $team_in_match->score = $team_in_match->score + 1;
+    $team_in_match->save();
+    $response['score'] = $team_in_match->score;
+    return Response::json($response);
+});
+
+Route::get('match_score_down/{match_id}/{team_id}', function($match_id, $team_id){
+    $team_in_match = Team_in_match::whereRaw('match_id = ' . $match_id . ' and team_id = ' . $team_id)->first();
+    if($team_in_match->score > 0)
+        $team_in_match->score = $team_in_match->score - 1;
+    else
+        $team_in_match->score = 0;
+    $team_in_match->save();
+    $response['score'] = $team_in_match->score;
+    return Response::json($response);
+});
+
+Route::get('match_state/{match_id}/{match_state_id}', function($match_id, $match_state_id){
+    $match = Match::find($match_id);
+    $match->match_state_id = $match_state_id;
+    $match->save();
+
+    if($match->match_state_id == 2) {
+        //$match->match_state_id = 3;
+        $match->begin_at = date('Y-m-d H:i:s');
+        $match->administrador = Auth::user()->id;
+        $match->save();  
+
+        //enviamos la notificacion
+        $notificationSender = new SendNotification();
+
+        $alert = 'El partido de ' . $match->teams[0]->name . ' vs ' . $match->teams[1]->name . ' ha comenzado!';
+        $metadata = array(
+            'push_type' => 'comienzo',
+            'type_id' => (int) 1,
+            'match_id' => (int) $match_id
+        );
+
+        $message = new ApnsPHP_Message();
+        $message -> setBadge(-1);
+        $message -> setText($alert);
+        $message -> setSound();
+
+        $message -> setCustomProperty('push_type', 'comienzo');
+        $message -> setCustomProperty('type_id', (int) 1);
+        $message -> setCustomProperty('match_id', (int) $match_id);;
+
+        // Set the expiry value to 30 seconds
+        $message -> setExpiry(30);
+
+        //hay que buscar los dispositivos de los usuarios que tengan User in match con el match id, es decir,
+        //que quieran jugar ese partido
+
+        $devices = DB::table('devices')
+            ->join('users', 'users.id', '=', 'devices.user_id')
+            ->join('user_in_matches', 'users.id', '=', 'user_in_matches.user_id')
+            ->where('user_in_matches.match_id', '=', $match_id)
+            ->select('devices.token', 'devices.user_id', 'devices.type')
+            ->get();
+
+        $android_push_array = array();
+        $ios_push_array = array();
+
+        foreach ($devices as $device) {
+            //$notification = new Notification();
+            //$notification->sent_at = date('Y-m-d H:i:s');
+            //$notification->message = $alert;
+            //$notification->some_id = $match_id;
+            ////$notification->user_id = $device->user_id;
+            //$notification->save();
+
+            if (strcmp($device->type, "android") === 0) {
+                //$metadata['server_time'] = //$notification->sent_at;
+                //$metadata['notification_id'] = //$notification->id;
+                array_push($android_push_array, $device->token);
+            } else {
+                //$message -> setCustomProperty('server_time', $notification->sent_at);
+                //$message -> setCustomProperty('notification_id', $notification->id);
+                array_push($ios_push_array, $device->token);
+            }            
+        }
+
+        //Se envía a todos los usuarios iOS
+        if(count($ios_push_array) > 0) {
+            $notificationSender->sendIOS($ios_push_array, $message);
+        }
+
+        //Se envía a todos los usuarios Android
+        if (count($android_push_array) > 0) {
+            $notificationSender->sendAndroid($android_push_array, $metadata, $alert);
+        }
+
+    }
+    if($match->match_state_id == 3) {
+        //fin del primer tiempo
+        $match->second_time_begin_at = date('Y-m-d H:i:s');
+        $match->save();  
+
+        $notificationSender = new SendNotification();
+
+        $alert = 'Fin primer tiempo entre' . $match->teams[0]->name . ' y ' . $match->teams[1]->name;
+        $metadata = array(
+            'push_type' => 'fin_primer',
+            'type_id' => (int) 1,
+            'match_id' => (int) $match_id
+        );
+
+        $message = new ApnsPHP_Message();
+        $message -> setBadge(-1);
+        $message -> setText($alert);
+        $message -> setSound();
+
+        $message -> setCustomProperty('push_type', 'fin_primer');
+        $message -> setCustomProperty('type_id', (int) 1);
+        $message -> setCustomProperty('match_id', (int) $match_id);;
+
+        // Set the expiry value to 30 seconds
+        $message -> setExpiry(30);
+
+        //hay que buscar los dispositivos de los usuarios que tengan User in match con el match id, es decir,
+        //que quieran jugar ese partido
+
+        $devices = DB::table('devices')
+            ->join('users', 'users.id', '=', 'devices.user_id')
+            ->join('user_in_matches', 'users.id', '=', 'user_in_matches.user_id')
+            ->where('user_in_matches.match_id', '=', $match_id)
+            ->select('devices.token', 'devices.user_id', 'devices.type')
+            ->get();
+
+        $android_push_array = array();
+        $ios_push_array = array();
+
+        foreach ($devices as $device) {
+            //$notification = new Notification();
+            //$notification->sent_at = date('Y-m-d H:i:s');
+            //$notification->message = $alert;
+            //$notification->some_id = $match_id;
+            ////$notification->user_id = $device->user_id;
+            //$notification->save();
+
+            if (strcmp($device->type, "android") === 0) {
+                //$metadata['server_time'] = $notification->sent_at;
+                //$metadata['notification_id'] = $notification->id;
+                array_push($android_push_array, $device->token);
+            } else {
+                //$message -> setCustomProperty('server_time', $notification->sent_at);
+                //$message -> setCustomProperty('notification_id', $notification->id);
+                array_push($ios_push_array, $device->token);
+            }            
+        }
+
+        //Se envía a todos los usuarios iOS
+        if(count($ios_push_array) > 0) {
+            $notificationSender->sendIOS($ios_push_array, $message);
+        }
+
+        //Se envía a todos los usuarios Android
+        if (count($android_push_array) > 0) {
+            $notificationSender->sendAndroid($android_push_array, $metadata, $alert);
+        }
+    }
+
+    if($match->match_state_id == 4) {
+        //segundo tiempo
+        //enviamos la notificacion
+
+        $notificationSender = new SendNotification();
+
+        $alert = 'Ha comenzado el segundo tiempo entre ' . $match->teams[0]->name . ' y ' . $match->teams[1]->name;
+        $metadata = array(
+            'push_type' => 'segundo_tiempo',
+            'type_id' => (int) 1,
+            'match_id' => (int) $match_id,
+            'begin_at' => $begin_at,
+            'match_status_id' => (int) $match->match_state_id + 1
+        );        
+
+        $message = new ApnsPHP_Message();
+        $message -> setBadge(-1);
+        $message -> setText($alert);
+        $message -> setSound();
+
+        $message -> setCustomProperty('push_type', 'comienzo');
+        $message -> setCustomProperty('type_id', (int) 1);
+        $message -> setCustomProperty('match_id', (int) $match_id);
+        $message -> setCustomProperty('begin_at', $begin_at);
+        $message -> setCustomProperty('match_status_id', (int) $match->match_state_id + 1);
+
+        // Set the expiry value to 30 seconds
+        $message -> setExpiry(30);
+
+        //hay que buscar los dispositivos de los usuarios que tengan User in match con el match id, es decir,
+        //que quieran jugar ese partido
+
+        $devices = DB::table('devices')
+            ->join('users', 'users.id', '=', 'devices.user_id')
+            ->join('user_in_matches', 'users.id', '=', 'user_in_matches.user_id')
+            ->where('user_in_matches.match_id', '=', $match_id)
+            ->select('devices.token', 'devices.user_id', 'devices.type')
+            ->get();
+
+        $android_push_array = array();
+        $ios_push_array = array();
+
+        foreach ($devices as $device) {
+            //$notification = new Notification();
+            //$notification->sent_at = date('Y-m-d H:i:s');
+            //$notification->message = $alert;
+            //$notification->some_id = $match_id;
+            ////$notification->user_id = $device->user_id;
+            //$notification->save();
+
+            if (strcmp($device->type, "android") === 0) {
+                //$metadata['server_time'] = $notification->sent_at;
+                //$metadata['notification_id'] = $notification->id;
+                array_push($android_push_array, $device->token);
+            } else {
+                //$message -> setCustomProperty('server_time', $notification->sent_at);
+                //$message -> setCustomProperty('notification_id', $notification->id);
+                array_push($ios_push_array, $device->token);
+            }            
+        }
+
+        //Se envía a todos los usuarios iOS
+        if(count($ios_push_array) > 0) {
+            $notificationSender->sendIOS($ios_push_array, $message);
+        }
+
+        //Se envía a todos los usuarios Android
+        if (count($android_push_array) > 0) {
+            $notificationSender->sendAndroid($android_push_array, $metadata, $alert);
+        }
+    }
+
+    if($match->match_state_id == 5) {
+        //termino segundo tiempo        
+
+        $notificationSender = new SendNotification();
+
+        $alert = 'Fin segundo tiempo entre ' . $match->teams[0]->name . ' y ' . $match->teams[1]->name;
+        $metadata = array(
+            'push_type' => 'fin_segundo',
+            'type_id' => (int) 1,
+            'match_id' => (int) $match_id
+        );
+
+        $message = new ApnsPHP_Message();
+        $message -> setBadge(-1);
+        $message -> setText($alert);
+        $message -> setSound();
+
+        $message -> setCustomProperty('push_type', 'fin_segundo');
+        $message -> setCustomProperty('type_id', (int) 1);
+        $message -> setCustomProperty('match_id', (int) $match_id);;
+
+        // Set the expiry value to 30 seconds
+        $message -> setExpiry(30);
+
+        //hay que buscar los dispositivos de los usuarios que tengan User in match con el match id, es decir,
+        //que quieran jugar ese partido
+
+        $devices = DB::table('devices')
+            ->join('users', 'users.id', '=', 'devices.user_id')
+            ->join('user_in_matches', 'users.id', '=', 'user_in_matches.user_id')
+            ->where('user_in_matches.match_id', '=', $match_id)
+            ->select('devices.token', 'devices.user_id', 'devices.type')
+            ->get();
+
+        $android_push_array = array();
+        $ios_push_array = array();
+
+        foreach ($devices as $device) {
+            //$notification = new Notification();
+            //$notification->sent_at = date('Y-m-d H:i:s');
+            //$notification->message = $alert;
+            //$notification->some_id = $match_id;
+            ////$notification->user_id = $device->user_id;
+            //$notification->save();
+
+            if (strcmp($device->type, "android") === 0) {
+                //$metadata['server_time'] = $notification->sent_at;
+                //$metadata['notification_id'] = $notification->id;
+                array_push($android_push_array, $device->token);
+            } else {
+                //$message -> setCustomProperty('server_time', $notification->sent_at);
+                //$message -> setCustomProperty('notification_id', $notification->id);
+                array_push($ios_push_array, $device->token);
+            }            
+        }
+
+        //Se envía a todos los usuarios iOS
+        if(count($ios_push_array) > 0) {
+            $notificationSender->sendIOS($ios_push_array, $message);
+        }
+
+        //Se envía a todos los usuarios Android
+        if (count($android_push_array) > 0) {
+            $notificationSender->sendAndroid($android_push_array, $metadata, $alert);
+        }
+    }
+
+    if($match->match_state_id == 6) {
+        //inicio primer alargue
+        $match->first_overtime_begin_at = date('Y-m-d H:i:s');
+        $match->save();  
+
+        $notificationSender = new SendNotification();
+
+        $alert = 'Inicio primer alargue entre ' . $match->teams[0]->name . ' y ' . $match->teams[1]->name;
+        $metadata = array(
+            'push_type' => 'alargue',
+            'type_id' => (int) 1,
+            'match_id' => (int) $match_id
+        );
+
+        $message = new ApnsPHP_Message();
+        $message -> setBadge(-1);
+        $message -> setText($alert);
+        $message -> setSound();
+
+        $message -> setCustomProperty('push_type', 'alargue');
+        $message -> setCustomProperty('type_id', (int) 1);
+        $message -> setCustomProperty('match_id', (int) $match_id);;
+
+        // Set the expiry value to 30 seconds
+        $message -> setExpiry(30);
+
+        //hay que buscar los dispositivos de los usuarios que tengan User in match con el match id, es decir,
+        //que quieran jugar ese partido
+
+        $devices = DB::table('devices')
+            ->join('users', 'users.id', '=', 'devices.user_id')
+            ->join('user_in_matches', 'users.id', '=', 'user_in_matches.user_id')
+            ->where('user_in_matches.match_id', '=', $match_id)
+            ->select('devices.token', 'devices.user_id', 'devices.type')
+            ->get();
+
+        $android_push_array = array();
+        $ios_push_array = array();
+
+        foreach ($devices as $device) {
+            //$notification = new Notification();
+            //$notification->sent_at = date('Y-m-d H:i:s');
+            //$notification->message = $alert;
+            //$notification->some_id = $match_id;
+            ////$notification->user_id = $device->user_id;
+            //$notification->save();
+
+            if (strcmp($device->type, "android") === 0) {
+                //$metadata['server_time'] = $notification->sent_at;
+                //$metadata['notification_id'] = $notification->id;
+                array_push($android_push_array, $device->token);
+            } else {
+                //$message -> setCustomProperty('server_time', $notification->sent_at);
+                //$message -> setCustomProperty('notification_id', $notification->id);
+                array_push($ios_push_array, $device->token);
+            }            
+        }
+
+        //Se envía a todos los usuarios iOS
+        if(count($ios_push_array) > 0) {
+            $notificationSender->sendIOS($ios_push_array, $message);
+        }
+
+        //Se envía a todos los usuarios Android
+        if (count($android_push_array) > 0) {
+            $notificationSender->sendAndroid($android_push_array, $metadata, $alert);
+        }
+    }
+    
+    if($match->match_state_id == 7) {
+        //final primer alargue        
+
+        //notificacion final primer alargue
+        $notificationSender = new SendNotification();
+
+        $alert = 'Final del primer alargue entre ' . $match->teams[0]->name . ' y ' . $match->teams[1]->name;
+        $metadata = array(
+            'push_type' => 'fin_alargue',
+            'type_id' => (int) 1,
+            'match_id' => (int) $match_id
+        );
+
+        $message = new ApnsPHP_Message();
+        $message -> setBadge(-1);
+        $message -> setText($alert);
+        $message -> setSound();
+
+        $message -> setCustomProperty('push_type', 'fin_alargue');
+        $message -> setCustomProperty('type_id', (int) 1);
+        $message -> setCustomProperty('match_id', (int) $match_id);;
+
+        // Set the expiry value to 30 seconds
+        $message -> setExpiry(30);
+
+        //hay que buscar los dispositivos de los usuarios que tengan User in match con el match id, es decir,
+        //que quieran jugar ese partido
+
+        $devices = DB::table('devices')
+            ->join('users', 'users.id', '=', 'devices.user_id')
+            ->join('user_in_matches', 'users.id', '=', 'user_in_matches.user_id')
+            ->where('user_in_matches.match_id', '=', $match_id)
+            ->select('devices.token', 'devices.user_id', 'devices.type')
+            ->get();
+
+        $android_push_array = array();
+        $ios_push_array = array();
+
+        foreach ($devices as $device) {
+            //$notification = new Notification();
+            //$notification->sent_at = date('Y-m-d H:i:s');
+            //$notification->message = $alert;
+            //$notification->some_id = $match_id;
+            ////$notification->user_id = $device->user_id;
+            //$notification->save();
+
+            if (strcmp($device->type, "android") === 0) {
+                //$metadata['server_time'] = $notification->sent_at;
+                //$metadata['notification_id'] = $notification->id;
+                array_push($android_push_array, $device->token);
+            } else {
+                //$message -> setCustomProperty('server_time', $notification->sent_at);
+                //$message -> setCustomProperty('notification_id', $notification->id);
+                array_push($ios_push_array, $device->token);
+            }            
+        }
+
+        //Se envía a todos los usuarios iOS
+        if(count($ios_push_array) > 0) {
+            $notificationSender->sendIOS($ios_push_array, $message);
+        }
+
+        //Se envía a todos los usuarios Android
+        if (count($android_push_array) > 0) {
+            $notificationSender->sendAndroid($android_push_array, $metadata, $alert);
+        }
+    }
+
+    if($match->match_state_id == 8) {
+        //inicio segundo alargue
+        $match->second_overtime_begin_at = date('Y-m-d H:i:s');
+        $match->save();
+
+        $notificationSender = new SendNotification();
+
+        $alert = 'Inicio del segundo alargue entre ' . $match->teams[0]->name . ' y ' . $match->teams[1]->name;
+        $metadata = array(
+            'push_type' => 'alargue2',
+            'type_id' => (int) 1,
+            'match_id' => (int) $match_id
+        );
+
+        $message = new ApnsPHP_Message();
+        $message -> setBadge(-1);
+        $message -> setText($alert);
+        $message -> setSound();
+
+        $message -> setCustomProperty('push_type', 'alargue2');
+        $message -> setCustomProperty('type_id', (int) 1);
+        $message -> setCustomProperty('match_id', (int) $match_id);;
+
+        // Set the expiry value to 30 seconds
+        $message -> setExpiry(30);
+
+        //hay que buscar los dispositivos de los usuarios que tengan User in match con el match id, es decir,
+        //que quieran jugar ese partido
+
+        $devices = DB::table('devices')
+            ->join('users', 'users.id', '=', 'devices.user_id')
+            ->join('user_in_matches', 'users.id', '=', 'user_in_matches.user_id')
+            ->where('user_in_matches.match_id', '=', $match_id)
+            ->select('devices.token', 'devices.user_id', 'devices.type')
+            ->get();
+
+        $android_push_array = array();
+        $ios_push_array = array();
+
+        foreach ($devices as $device) {
+            //$notification = new Notification();
+            //$notification->sent_at = date('Y-m-d H:i:s');
+            //$notification->message = $alert;
+            //$notification->some_id = $match_id;
+            ////$notification->user_id = $device->user_id;
+            //$notification->save();
+
+            if (strcmp($device->type, "android") === 0) {
+                //$metadata['server_time'] = $notification->sent_at;
+                //$metadata['notification_id'] = $notification->id;
+                array_push($android_push_array, $device->token);
+            } else {
+                //$message -> setCustomProperty('server_time', $notification->sent_at);
+                //$message -> setCustomProperty('notification_id', $notification->id);
+                array_push($ios_push_array, $device->token);
+            }            
+        }
+
+        //Se envía a todos los usuarios iOS
+        if(count($ios_push_array) > 0) {
+            $notificationSender->sendIOS($ios_push_array, $message);
+        }
+
+        //Se envía a todos los usuarios Android
+        if (count($android_push_array) > 0) {
+            $notificationSender->sendAndroid($android_push_array, $metadata, $alert);
+        }
+    }
+
+    if($match->match_state_id == 9) {
+        //finalizo segundo alargue
+
+        $notificationSender = new SendNotification();
+
+        $alert = 'Final del segundo tiempo entre ' . $match->teams[0]->name . ' y ' . $match->teams[1]->name;
+        $metadata = array(
+            'push_type' => 'fin_alargue2',
+            'type_id' => (int) 1,
+            'match_id' => (int) $match_id
+        );
+
+        $message = new ApnsPHP_Message();
+        $message -> setBadge(-1);
+        $message -> setText($alert);
+        $message -> setSound();
+
+        $message -> setCustomProperty('push_type', 'fin_alargue2');
+        $message -> setCustomProperty('type_id', (int) 1);
+        $message -> setCustomProperty('match_id', (int) $match_id);;
+
+        // Set the expiry value to 30 seconds
+        $message -> setExpiry(30);
+
+        //hay que buscar los dispositivos de los usuarios que tengan User in match con el match id, es decir,
+        //que quieran jugar ese partido
+
+        $devices = DB::table('devices')
+            ->join('users', 'users.id', '=', 'devices.user_id')
+            ->join('user_in_matches', 'users.id', '=', 'user_in_matches.user_id')
+            ->where('user_in_matches.match_id', '=', $match_id)
+            ->select('devices.token', 'devices.user_id', 'devices.type')
+            ->get();
+
+        $android_push_array = array();
+        $ios_push_array = array();
+
+        foreach ($devices as $device) {
+            //$notification = new Notification();
+            //$notification->sent_at = date('Y-m-d H:i:s');
+            //$notification->message = $alert;
+            //$notification->some_id = $match_id;
+            ////$notification->user_id = $device->user_id;
+            //$notification->save();
+
+            if (strcmp($device->type, "android") === 0) {
+                //$metadata['server_time'] = $notification->sent_at;
+                //$metadata['notification_id'] = $notification->id;
+                array_push($android_push_array, $device->token);
+            } else {
+                //$message -> setCustomProperty('server_time', $notification->sent_at);
+                //$message -> setCustomProperty('notification_id', $notification->id);
+                array_push($ios_push_array, $device->token);
+            }            
+        }
+
+        //Se envía a todos los usuarios iOS
+        if(count($ios_push_array) > 0) {
+            $notificationSender->sendIOS($ios_push_array, $message);
+        }
+
+        //Se envía a todos los usuarios Android
+        if (count($android_push_array) > 0) {
+            $notificationSender->sendAndroid($android_push_array, $metadata, $alert);
+        }
+    }
+
+    if($match->match_state_id == 10) {
+        //inicio penales
+
+        $notificationSender = new SendNotification();
+
+        $alert = 'Inicio penales entre ' . $match->teams[0]->name . ' y ' . $match->teams[1]->name;
+        $metadata = array(
+            'push_type' => 'penales',
+            'type_id' => (int) 1,
+            'match_id' => (int) $match_id
+        );
+
+        $message = new ApnsPHP_Message();
+        $message -> setBadge(-1);
+        $message -> setText($alert);
+        $message -> setSound();
+
+        $message -> setCustomProperty('push_type', 'penales');
+        $message -> setCustomProperty('type_id', (int) 1);
+        $message -> setCustomProperty('match_id', (int) $match_id);;
+
+        // Set the expiry value to 30 seconds
+        $message -> setExpiry(30);
+
+        //hay que buscar los dispositivos de los usuarios que tengan User in match con el match id, es decir,
+        //que quieran jugar ese partido
+
+        $devices = DB::table('devices')
+            ->join('users', 'users.id', '=', 'devices.user_id')
+            ->join('user_in_matches', 'users.id', '=', 'user_in_matches.user_id')
+            ->where('user_in_matches.match_id', '=', $match_id)
+            ->select('devices.token', 'devices.user_id', 'devices.type')
+            ->get();
+
+        $android_push_array = array();
+        $ios_push_array = array();
+
+        foreach ($devices as $device) {
+            //$notification = new Notification();
+            //$notification->sent_at = date('Y-m-d H:i:s');
+            //$notification->message = $alert;
+            //$notification->some_id = $match_id;
+            //$notification->user_id = $device->user_id;
+            //$notification->save();
+
+            if (strcmp($device->type, "android") === 0) {
+                //$metadata['server_time'] = $notification->sent_at;
+                //$metadata['notification_id'] = $notification->id;
+                array_push($android_push_array, $device->token);
+            } else {
+                //$message -> setCustomProperty('server_time', $notification->sent_at);
+                //$message -> setCustomProperty('notification_id', $notification->id);
+                array_push($ios_push_array, $device->token);
+            }            
+        }
+
+        //Se envía a todos los usuarios iOS
+        if(count($ios_push_array) > 0) {
+            $notificationSender->sendIOS($ios_push_array, $message);
+        }
+
+        //Se envía a todos los usuarios Android
+        if (count($android_push_array) > 0) {
+            $notificationSender->sendAndroid($android_push_array, $metadata, $alert);
+        }
+    }
+
+    if($match->match_state_id == 12 || $match->match_state_id == 11) {
+        //termino partido
+
+        $player_id = $_GET['player_id'];
+
+        $match->end_at = date('Y-m-d H:i:s');
+        $match->save();  
+
+        if($match->match_state_id == 11) {
+            $alert = "Fin de penales y fin partido";
+        } else {
+            $alert = "Fin de partido";
+        }
+
+        $notificationSender = new SendNotification();
+
+        $config = DB::table('configurations')
+            ->select('ttp_normal')
+            ->first();
+
+        $gol_local = $_GET['gol_local'];
+        $gol_visita = $_GET['gol_visita'];
+
+        $metadata = array(
+            'push_type' => 'final',
+            'match_id' => (int) $match_id,
+            'gol_local' => (int) $gol_local,
+            'gol_visita' => (int) $gol_visita);
+
+        // Enviar notificaciones 
+        $devices = DB::table('devices')
+            ->join('users', 'users.id', '=', 'devices.user_id')
+            ->join('user_in_matches', 'users.id', '=', 'user_in_matches.user_id')
+            ->where('user_in_matches.match_id', '=', $match_id)
+            ->select('devices.token', 'devices.user_id', 'devices.type')
+            ->get();
+
+        $android_push_array = array();
+        $ios_push_array = array();
+
+        $message = new ApnsPHP_Message();
+        $message -> setBadge(-1);
+        $message -> setText($alert);
+        $message -> setSound();
+
+        $message -> setCustomProperty('push_type', 'final');
+        $message -> setCustomProperty('match_id', (int) $match_id);
+        $message -> setCustomProperty('gol_local', (int) $gol_local);
+        $message -> setCustomProperty('gol_visita', (int) $gol_visita);
+
+        // Set the expiry value to 30 seconds
+        $message -> setExpiry((int) $config->ttp_normal);
+
+        if(isset($player_id)) {
+            $metadata['player_id'] = $player_id;
+            $message -> setCustomProperty('player_id', $player_id);
+        } else {
+            $metadata['player_id'] = -1;
+            $message -> setCustomProperty('player_id', -1);   
+        }
+
+        //we iterate through each device
+        foreach ($devices as $device) {
+            //$notification = new Notification();
+            //$notification->sent_at = date('Y-m-d H:i:s');
+            //$notification->message = $alert;
+            //$notification->some_id = $match_id;
+            ////$notification->user_id = $device->user_id;
+            //$notification->save();
+
+            if (strcmp($device->type, "android") === 0) {
+                array_push($android_push_array, $device->token);
+            } else {
+                array_push($ios_push_array, $device->token);
+            }                 
+        }
+
+        if(count($ios_push_array) > 0) {
+            $notificationSender->sendIOS($ios_push_array, $message);
+        }
+
+        //Se envía a todos los usuarios Android
+        if (count($android_push_array) > 0) {
+            $notificationSender->sendAndroid($android_push_array, $metadata, $alert);
+        }
+    }
+
+    $match_state = Match_state::find($match_state_id);
+    $match_next_status_text = '';
+    $match_next_status_text .= $match->match_state_id == 1 ? 'Inicio de Partido' : '';
+    $match_next_status_text .= $match->match_state_id == 2 ? 'Fin de Primer Tiempo' : '';
+    $match_next_status_text .= $match->match_state_id == 3 ? 'Inicio Segundo Tiempo' : '';
+    $match_next_status_text .= $match->match_state_id == 4 ? 'Fin de Segundo Tiempo' : '';
+    $match_next_status_text .= $match->match_state_id == 5 ? 'Iniciar de Primer Alargue' : '';
+    $match_next_status_text .= $match->match_state_id == 6 ? 'Fin de Primer Alargue' : '';
+    $match_next_status_text .= $match->match_state_id == 7 ? 'Inicio de Segundo Alargue' : '';
+    $match_next_status_text .= $match->match_state_id == 8 ? 'Fin de Segundo Alargue' : '';
+    $match_next_status_text .= $match->match_state_id == 9 ? 'Penales' : '';
+    $match_next_status_text .= $match->match_state_id == 10 ? 'Fin Penales' : '';
+    $match_next_status_text .= $match->match_state_id == 11 ? 'Fin Partido' : '';
+
+    if ($match_state_id <= 11) {
+        $match_next_status_id = (int) $match_state_id + 1;
+    } else {
+        $match_next_status_id = 12;
+    }
+
+    return Response::json(array(
+        'match_next_status_id' => $match_next_status_id,
+        'match_next_status_text' => $match_next_status_text, 'estado_actual' => $match->match_state_id
+        ));
+});
+
+Route::get('match_time/{match_id}', function($match_id){
+    $match = Match::find($match_id);
+    $match->load('teams');
+    $tiempo='';
+    if($match->match_state_id == 2){    $tiempo=strtotime(date('Y-m-d H:i:s'))-strtotime($match->begin_at) ;}
+    if($match->match_state_id == 4){    $tiempo=strtotime(date('Y-m-d H:i:s'))-strtotime($match->second_time_begin_at) ;}
+    if($match->match_state_id == 6){    $tiempo=strtotime(date('Y-m-d H:i:s'))-strtotime($match->first_overtime_begin_at) ;}
+    if($match->match_state_id == 8){    $tiempo=strtotime(date('Y-m-d H:i:s'))-strtotime($match->second_overtime_begin_at) ;}
+
+    //$match=date('Y-m-d H:i:s');
+    /*$team0_in_match = Team_in_match::whereRaw('match_id = ' . $match->id . ' and team_id = ' . $match->teams[0])->first();
+    $team1_in_match = Team_in_match::whereRaw('match_id = ' . $match->id . ' and team_id = ' . $match->teams[1])->first();
+    Response::json(array('match' => array('id' => $match->id, 'teams' => array())));*/
+    return Response::json($tiempo);
+});
+
+Route::get('match_data/{match_id}', function($match_id){
+    $match = Match::find($match_id);
+    $match->load('teams');
+    //$match=date('Y-m-d H:i:s');
+    /*$team0_in_match = Team_in_match::whereRaw('match_id = ' . $match->id . ' and team_id = ' . $match->teams[0])->first();
+    $team1_in_match = Team_in_match::whereRaw('match_id = ' . $match->id . ' and team_id = ' . $match->teams[1])->first();
+    Response::json(array('match' => array('id' => $match->id, 'teams' => array())));*/
+    return Response::json($match);
+});
+
+function get_data($url) {
+    $ch = curl_init();
+    $timeout = 5;
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+    $data = curl_exec($ch);
+    curl_close($ch);
+    return $data;
+}
+ /*****************************   DATAFACTORY *************************************/
+Route::get('match_fixture/{match_id}', function($match_id){
+    $string=get_data("http://localhost/datafactory/deportes.futbol.sudafrica2010.fixture-1.xml");
+    $xml = simplexml_load_string($string);
+    $partido=0+$match_id;
+    $rr=$xml->fecha->partido[$partido];
+    return Response::json($rr);
+});
+
+Route::get('match_calendario/', function(){
+    $string=get_data("http://localhost/datafactory/deportes.futbol.sudafrica2010.calendario.xml");
+    $xml = simplexml_load_string($string);
+    //$partido=0+$match_id;
+    //$rr=$xml->fecha->partido[$partido];
+    return Response::json($xml);
+});
+
+Route::get('match_datos/{match_id}', function($match_id){
+    $string=get_data("http://localhost/datafactory/deportes.futbol.sudafrica2010.ficha.".$match_id.".mam-1.xml");
+    $xml = simplexml_load_string($string);
+    //$partido=0+$match_id;
+    //$rr=$xml->fecha->partido[$partido];
+    return Response::json($xml);
+});
+
+Route::get('team_plantel/{match_id}', function($match_id){
+    $string=get_data("http://localhost/datafactory/deportes.futbol.sudafrica2010.plantelxcampeonato.xml");
+    $xml = simplexml_load_string($string);
+    $partido=0+$match_id;
+    $rr='';
+    for ($i=0; $i < $xml->equipo->count() ; $i++) { 
+        if($xml->equipo[$i]['id']==$match_id){
+            $rr=$xml->equipo[$i];
+            break;
+        }
+    }
+    
+    return Response::json($rr);
+});
+
+Route::get('team_posicion/{match_id}', function($match_id){
+    $string=get_data("http://localhost/datafactory/deportes.futbol.sudafrica2010.posiciones.xml");
+    $xml = simplexml_load_string($string);
+    $partido=0+$match_id;
+    $rr='';
+   
+        for ($i=0; $i < $xml->equipo->count() ; $i++) { 
+            if($xml->equipo[$i]['id']==$match_id){
+                $rr=$xml->equipo[$i];
+                break;
+            }
+        }
+    
+    return Response::json($rr);
+}
+);
+/******************************** Fin DATAFACTORY **********************************/
+
+Route::get('incidence/{match_id}/{team_id}/{incidence_type_id}', function($match_id, $team_id, $incidence_type_id){
+    $team = Team::find($team_id);
+
+    // Crear mensaje de incidencia
+    $incidence_message = '';
+    if($incidence_type_id == 1):
+        $incidence_message = $team->name . ' ha anotado un GOL!';
+    elseif($incidence_type_id == 2):
+        $incidence_message = 'Tiro libre para ' . $team->name . '!';
+    elseif($incidence_type_id == 3):
+        $incidence_message = $team->name . ' lanza un corner!';
+    elseif($incidence_type_id == 4):
+        $incidence_message = 'Penal para ' . $team->name;
+    elseif($incidence_type_id == 5):
+        $incidence_message = $team->name . ' anota!';
+    endif;
+
+    // Registrar incidencia 
+    $incidence = new Incidence();
+    $incidence->happened_at = date('Y-m-d H:i:s');
+    $incidence->match_id = (int) $match_id;
+    $incidence->incidence_type_id = (int) $incidence_type_id;
+    $incidence->incidence_state_id = 1;
+    $incidence->team_id = (int) $team_id;
+    $incidence->match_time = $incidence->match_time($incidence->match_id, $incidence->happened_at);
+    $incidence->message = $incidence_message;
+    $incidence->occurred_possibility = 0; // Este campo almacena el resultado de la incidencia, se inicializa en 0
+    $incidence->save();
+
+    $notificationSender = new SendNotification();
+
+    $alert = $incidence->message;
+
+    $config = DB::table('configurations')
+        ->select('ttp_normal')
+        ->first();    
+
+    $metadata = array(
+        'push_type' => 'incidencia',
+        'type_id' => (int) $incidence_type_id,
+        'match_id' => (int) $match_id,
+        'team_id' => (int) $team_id,
+        'team_name' => $team->name,
+        'incidence_id' => (int) $incidence->id,
+        'server_time' => $incidence->happened_at,
+        'match_time' => $incidence->match_time,
+        'incidence_duration' => (int) $config->ttp_normal);
+
+    // Respuesta JSON con datos de la incidencia (datos transversales a todos los tipos de incidencia) 
+
+    $response = array(
+        'match_id' => (int) $match_id, 
+        'team_id' => (int) $team_id, 
+        'incidence_id' => (int) $incidence->id, 
+        'team' => $team->name, 
+        'message' => $incidence_message,
+        'match_time' => $incidence->match_time, 
+        'server_time' => $incidence->happened_at);
+
+    // Enviar notificaciones 
+    $devices = DB::table('devices')
+        ->join('users', 'users.id', '=', 'devices.user_id')
+        ->join('user_in_matches', 'users.id', '=', 'user_in_matches.user_id')
+        ->where('user_in_matches.match_id', '=', $match_id)
+        ->select('devices.token', 'devices.user_id', 'devices.type')
+        ->get();
+
+    $android_push_array = array();
+    $ios_push_array = array();
+
+    $message = new ApnsPHP_Message();
+    $message -> setBadge(-1);
+    $message -> setText($alert);
+    $message -> setSound();
+
+    $message -> setCustomProperty('push_type', 'incidencia');
+    $message -> setCustomProperty('type_id', (int) $incidence_type_id);
+    $message -> setCustomProperty('match_id', (int) $match_id);
+    $message -> setCustomProperty('team_id', (int) $team_id);
+    $message -> setCustomProperty('team_name', $team->name);
+    $message -> setCustomProperty('incidence_id', (int) $incidence->id);
+    $message -> setCustomProperty('server_time', $incidence->happened_at);
+    $message -> setCustomProperty('match_time', $incidence->match_time);
+    $message -> setCustomProperty('incidence_duration', (int) $config->ttp_normal);
+
+    if($incidence_type_id == 1 || $incidence_type_id == 5) {
+        //si fue gol, tenemos que agregar el resultado.
+        //tenemos el team id, tenemos que devolver el score
+        $team_in_match = Team_in_match::whereRaw('match_id = ' . $match_id . ' and team_id = ' . $team_id)->first();
+        $metadata['team_score'] = (int) $team_in_match->score + 1;
+
+        $message -> setCustomProperty('team_score', (int) $team_in_match->score);
+    }
+
+    // Set the expiry value to 30 seconds
+    $message -> setExpiry((int) $config->ttp_normal);
+
+    //we iterate through each device
+    foreach ($devices as $device) {
+        $notification = new Notification();
+        $notification->sent_at = date('Y-m-d H:i:s');
+        $notification->message = $alert;
+        $notification->some_id = $incidence_type_id;
+        $notification->user_id = $device->user_id;
+        $notification->save();
+        $metadata['notification_id'] = $notification->id;
+
+        if (strcmp($device->type, "android") === 0) {
+            array_push($android_push_array, $device->token);
+        } else {
+            array_push($ios_push_array, $device->token);
+        }                 
+    }
+
+    if(count($ios_push_array) > 0) {
+        $notificationSender->sendIOS($ios_push_array, $message);
+    }
+
+    //Se envía a todos los usuarios Android
+    if (count($android_push_array) > 0) {
+        $notificationSender->sendAndroid($android_push_array, $metadata, $alert);
+    }    
+
+    // Agregar datos específicos por tipo de incidencia 
+    if($incidence_type_id == 1){
+        $team_in_match = Team_in_match::whereRaw('match_id = ' . $match_id . ' and team_id = ' . $team_id)->first();
+        $team_in_match->score = $team_in_match->score + 1;
+        $team_in_match->save();
+
+        $response['score'] = $team_in_match->score;
+    }
+    if($incidence_type_id == 5){
+        $team_in_match = Team_in_match::whereRaw('match_id = ' . $match_id . ' and team_id = ' . $team_id)->first();
+        $team_in_match->penalties = $team_in_match->penalties + 1;
+        $team_in_match->save();
+
+        $response['penalties'] = $team_in_match->penalties;
+    }
+
+    return Response::json($response);
+});
+
+Route::get('incidence_result/{incidence_id}/{possibility_id}', function($incidence_id, $possibility_id){
+
+    //buscamos la incidencia a generar notificaciones y le cambiamos a cerrada
+    $incidence = Incidence::find($incidence_id);
+    $incidence->load('type');
+    $incidence->occurred_possibility = $possibility_id;
+    $incidence->incidence_state_id = 2;
+    $incidence->save();
+
+    $match_id = (int) $incidence->match_id;
+
+    $possibility = DB::table('possibilities')
+            ->where('possibilities.id', '=', $possibility_id)
+            ->select('possibilities.value')
+            ->first();
+
+    //traer usuarios con apuestas abiertas
+    $bets = Bet::whereRaw('result = 0 AND incidence_id = ' . $incidence_id)->get();
+
+    $notificationSender = new SendNotification();
+    
+    $userCalculations = new UserCalculations();
+
+    $config = DB::table('configurations')
+        ->select('ttp_normal')
+        ->first();
+
+    $idUsuariosApostaron = array();
+
+    foreach ($bets as $bet) {
+
+        //buscamos al usuario que apostó en esta apuesta
+        $user = User::find($bet->user_id);
+
+        array_push($idUsuariosApostaron, $user->id);
+        
+        //enviar notificacion a todos los dispositivos del usuario
+        $devices = Device::where('user_id', $bet->user_id)->get();
+
+        if($bet->bet_to_possibility === (int) $possibility_id) {
+            //el usuario acertó la apuesta, tenemos que calcular las nuevas estadísticas de este usuario            
+
+            //obtenemos su factor dependiendo del nivel en que se encuentra
+            $level = $userCalculations->getUserLevel($user->user_fb_id);
+
+            //multiplicamos el valor que se da por incidencia por el multiplicador del nivel del usuario
+            $beforeScore = $user->total_score;
+            $scoreGained = ($possibility->value) * $level->weight;
+            $user->total_score += $scoreGained;
+
+            //also we have to save the new number of bets won
+            $user->bets_won = $user->bets_won + 1;
+
+            //guardamos los nuevos datos del usuario
+            $user->save();
+
+            $bet->result = 1; // acertó
+            $bet->score = $scoreGained;
+
+            //now we have to check if he/she gained a new level
+            //primer buscamos si ha ganado nuevos badges
+            $userCalculations->checkForNewBadge($user->user_fb_id);
+
+            //luego vemos si ha subido de nivel 
+            $ifNewLevel = $userCalculations->checkIfNewLevel($user, $beforeScore, $user->total_score);
+
+            //vemos su nuevo nivel
+            $newUserLevel = $userCalculations->getUserLevel($user->user_fb_id);
+
+            //convertimos a mensaje "leible"
+            if ($ifNewLevel) {
+                $ifNewLevel = "YES";
+            } else {
+                $ifNewLevel = "NO";
+            }
+
+            $metadata = array(
+                'push_type' => 'bet',
+                'incidence_id' => (int) $incidence_id,
+                'bet_id' => (int) $bet->id,
+                'score' => (int) $scoreGained,
+                'total_score' => (int) $user->total_score,
+                'result' => (int) $bet->result,
+                'new_level_gained' => $ifNewLevel,
+                'match_id' => (int) $match_id,
+                'user_level' => $newUserLevel,
+                'pos' => (int) $possibility_id
+            );
+
+            //notificamos al usuario que ha ganado
+            $alert = 'Ganaste ' . $scoreGained . ' puntos!'; 
+
+            $android_push_array = array();
+            $ios_push_array = array();
+
+            $message = new ApnsPHP_Message();
+            $message -> setBadge(-1);
+            $message -> setText($alert);
+            $message -> setSound();
+
+            $message -> setCustomProperty('push_type', 'bet');
+            $message -> setCustomProperty('incidence_id', (int) $incidence_id);
+            $message -> setCustomProperty('bet_id', (int) $bet->id);
+            $message -> setCustomProperty('score', (int) $scoreGained);
+            $message -> setCustomProperty('total_score', (int) $user->total_score);
+            $message -> setCustomProperty('result', (int) $bet->result);
+            $message -> setCustomProperty('new_level_gained', $ifNewLevel);
+            $message -> setCustomProperty('user_level', $newUserLevel);
+            $message -> setCustomProperty('match_id', (int) $match_id);
+            $message -> setCustomProperty('pos', (int) $possibility_id);
+
+            $message -> setExpiry($config->ttp_normal);
+
+            foreach ($devices as $device) {
+                if (strcmp($device->type, "android") === 0) {
+                    array_push($android_push_array, $device->token);
+                } else {
+                    array_push($ios_push_array, $device->token);
+                }
+            }
+
+            if(count($ios_push_array) > 0) {
+                $notificationSender->sendIOS($ios_push_array, $message);
+            }
+
+            //Se envía a todos los usuarios Android
+            if (count($android_push_array) > 0) {
+                $notificationSender->sendAndroid($android_push_array, $metadata, $alert);
+            }  
+
+        } else {
+            //si el usuario perdió la apuesta, solamente notificamos que perdió
+
+            $bet->result = 2; // le fail
+
+            //sola
+            $metadata = array(
+                'push_type' => 'bet',
+                'incidence_id' => (int) $incidence_id,
+                'bet_id' => (int) $bet->id,
+                'score' => (int) 0,
+                'total_score' => (int) $user->total_score,
+                'result' => (int) $bet->result,
+                'match_id' => (int) $match_id,
+                'pos' => (int) $possibility_id
+            );
+
+            $android_push_array = array();
+
+            $alert = 'No acertaste!';
+
+            $android_push_array = array();
+            $ios_push_array = array();
+
+            $message = new ApnsPHP_Message();
+            $message -> setBadge(-1);
+            $message -> setText($alert);
+            $message -> setSound();
+
+            $message -> setCustomProperty('push_type', 'bet');
+            $message -> setCustomProperty('incidence_id', (int) $incidence_id);
+            $message -> setCustomProperty('bet_id', (int) $bet->id);
+            $message -> setCustomProperty('score', (int) 0);
+            $message -> setCustomProperty('total_score', (int) $user->total_score);
+            $message -> setCustomProperty('result', (int) $bet->result);
+            $message -> setCustomProperty('match_id', (int) $match_id);
+            $message -> setCustomProperty('pos', (int) $possibility_id);
+
+            $message -> setExpiry($config->ttp_normal);
+
+            foreach ($devices as $device) {
+                if (strcmp($device->type, "android") === 0) {
+                    array_push($android_push_array, $device->token);
+                } else {
+                    array_push($ios_push_array, $device->token);
+                }
+            }
+
+            if(count($ios_push_array) > 0) {
+                $notificationSender->sendIOS($ios_push_array, $message);
+            }
+
+            //Se envía a todos los usuarios Android
+            if (count($android_push_array) > 0) {
+                $notificationSender->sendAndroid($android_push_array, $metadata, $alert);
+            }
+        }
+
+        //guardamos la apuesta actualizada en la BD
+        $bet->save();
+    } 
+
+    $pos = (int) $possibility_id;
+
+    //si fue gol, buscamos a los usuarios q estan jugando el partido pero no apostaron para avisarles
+    if($pos === 1 || $pos === 5 || $pos === 9 || $pos === 10 || $pos === 11 || $pos === 12 || $pos === 13 || $pos === 18) {
+
+        if($idUsuariosApostaron) {
+            $query = DB::table('user_in_matches')
+                ->where('user_in_matches.match_id', '=', $match_id)
+                ->whereNotIn('users.id', $idUsuariosApostaron)
+                ->join('users', 'user_in_matches.user_id', '=', 'users.id')
+                ->join('devices', 'users.id', '=', 'devices.user_id')
+                ->select('users.id','devices.token', 'devices.type')
+                ->get();
+        } else {
+            $query = DB::table('user_in_matches')
+                ->where('user_in_matches.match_id', '=', $match_id)
+                ->join('users', 'user_in_matches.user_id', '=', 'users.id')
+                ->join('devices', 'users.id', '=', 'devices.user_id')
+                ->select('users.id','devices.token', 'devices.type')
+                ->get();
+        }
+
+        $notificationSender = new SendNotification();
+
+        $alert = $incidence->message;
+
+        $config = DB::table('configurations')
+            ->select('ttp_normal')
+            ->first();  
+
+        $team = Team::find($incidence->team_id);
+
+        $metadata = array(
+            'push_type' => 'incidencia',
+            'type_id' => (int) 1,
+            'match_id' => (int) $match_id,
+            'team_id' => (int) $incidence->team_id,
+            'team_name' => $team->name,
+            'incidence_id' => (int) $incidence->id,
+            'server_time' => $incidence->happened_at,
+            'match_time' => $incidence->match_time,
+            'incidence_duration' => (int) $config->ttp_normal);        
+
+        $android_push_array = array();
+        $ios_push_array = array();
+
+        $message = new ApnsPHP_Message();
+        $message -> setBadge(-1);
+        $message -> setText($alert);
+        $message -> setSound();
+
+        $message -> setCustomProperty('push_type', 'incidencia');
+        $message -> setCustomProperty('type_id', (int) 1);
+        $message -> setCustomProperty('match_id', (int) $match_id);
+        $message -> setCustomProperty('team_id', (int) $incidence->team_id);
+        $message -> setCustomProperty('team_name', $team->name);
+        $message -> setCustomProperty('incidence_id', (int) $incidence->id);
+        $message -> setCustomProperty('server_time', $incidence->happened_at);
+        $message -> setCustomProperty('match_time', $incidence->match_time);
+        $message -> setCustomProperty('incidence_duration', (int) $config->ttp_normal);
+
+        $team_in_match = Team_in_match::whereRaw('match_id = ' . $match_id . ' and team_id = ' . $incidence->team_id)->first();
+        $metadata['team_score'] = (int) $team_in_match->score + 1;
+
+        $message -> setCustomProperty('team_score', (int) $team_in_match->score);
+        // Set the expiry value to 30 seconds
+        $message -> setExpiry((int) $config->ttp_normal);
+
+        //we iterate through each device
+        foreach ($query as $device) {
+            if (strcmp($device->type, "android") === 0) {
+                array_push($android_push_array, $device->token);
+            } else {
+                array_push($ios_push_array, $device->token);
+            }                 
+        }
+
+        if(count($ios_push_array) > 0) {
+            $notificationSender->sendIOS($ios_push_array, $message);
+        }
+
+        //Se envía a todos los usuarios Android
+        if (count($android_push_array) > 0) {
+            $notificationSender->sendAndroid($android_push_array, $metadata, $alert);
+        }   
+    }   
+
+    return Response::json(array('message' => 'Incidence ' . $incidence_id . ' resulted in ' . $possibility_id));
+});
+
+Route::get('match/users/{match_id}', function($match_id){
+    //solo si necesitamos más datos del usuario reemplazar esto en la query
+    //->select('users.*', 'devices.token', 'devices.type')
+    $query = DB::table('user_in_matches')
+            ->join('users', 'user_in_matches.user_id', '=', 'users.id')
+            ->join('devices', 'users.id', '=', 'devices.user_id')
+            ->select('users.id','devices.token', 'devices.type')
+            ->distinct()
+            ->get();
+
+    return Response::json($query);
+});
+
+/**
+* Las variables son del tipo :
+* v_goal: <valor>
+* v_freek: <libre-gol,libre-atajada,libre-despeje,libre-afuera>
+* v_corner: <corner-gol,corner-atajada,corner-despeje,corner-afuera>
+* v_penal: <penal-sup. derecha,penal-sup. izquierda,penal-inferior derecha,penal-inferior izquierda,penal-centro,penal-afuera,penal-atajada>
+*
+*
+* Ejemplo:
+*
+* config/1000/400,300,200,100/400,300,200,100/400,400,400,400,500,300,400
+*/
+Route::get('config/{v_goal}/{v_freek}/{v_corner}/{v_penal}', 
+    function($v_goal, $v_freek, $v_corner, $v_penal){
+    
+    //$it_goals = explode(",", $gol);
+    $v_goals = explode(",", $v_goal);
+
+    //$it_freeks = explode(",", $tirolibre);
+    $v_freeks = explode(",", $v_freek);
+
+    //$it_corners = explode(",", $corner);
+    $v_corners = explode(",", $v_corner);
+
+    //$it_penals = explode(",", $penal);
+    $v_penals = explode(",", $v_penal);
+
+    //Goles
+    DB::table('possibilities')
+        ->where('id', 18)
+        ->update(array('value' => (int) $v_goals[0]));  
+
+    //Tiros libres
+    //gol
+    DB::table('possibilities')
+        ->where('id', 1)
+        ->update(array('value' => (int) $v_freeks[0]));
+
+    //atajada
+    DB::table('possibilities')
+        ->where('id', 2)
+        ->update(array('value' => (int) $v_freeks[1]));
+    
+    //despeje
+    DB::table('possibilities')
+        ->where('id', 3)
+        ->update(array('value' => (int) $v_freeks[2]));
+
+    //afuera
+    DB::table('possibilities')
+        ->where('id', 4)
+        ->update(array('value' => (int) $v_freeks[3]));
+
+    //Corner
+    //gol
+    DB::table('possibilities')
+        ->where('id', 5)
+        ->update(array('value' => (int) $v_corners[0]));
+
+    //atajada
+    DB::table('possibilities')
+        ->where('id', 6)
+        ->update(array('value' => (int) $v_corners[1]));
+    
+    //despeje
+    DB::table('possibilities')
+        ->where('id', 7)
+        ->update(array('value' => (int) $v_corners[2]));
+
+    //afuera
+    DB::table('possibilities')
+        ->where('id', 8)
+        ->update(array('value' => (int) $v_corners[3]));
+
+    //Penales
+    //sup. derecha
+    DB::table('possibilities')
+        ->where('id', 9)
+        ->update(array('value' => (int) $v_penals[0]));
+
+    //sup. izquierda
+    DB::table('possibilities')
+        ->where('id', 10)
+        ->update(array('value' => (int) $v_penals[1]));
+    
+    //inferior derecha
+    DB::table('possibilities')
+        ->where('id', 11)
+        ->update(array('value' => (int) $v_penals[2]));
+
+    //inferior izquierda
+    DB::table('possibilities')
+        ->where('id', 12)
+        ->update(array('value' => (int) $v_penals[3]));
+
+    //centro
+    DB::table('possibilities')
+        ->where('id', 13)
+        ->update(array('value' => (int) $v_penals[4]));
+    
+    //afuera
+    DB::table('possibilities')
+        ->where('id', 14)
+        ->update(array('value' => (int) $v_penals[5]));
+
+    //atajada
+    DB::table('possibilities')
+        ->where('id', 15)
+        ->update(array('value' => (int) $v_penals[6]));
+
+    return Response::json(array('status' => 'OK'));
+});
+
+/**
+* Las variables son:
+* ttp: el tiempo para jugar las apuestas. Tipo <valor>
+* ttps: el tiempo para jugar las apuestas especiales como que habrá un gol. Tipo <valor>
+* mvp: El puntaje a asignar por acertar al mejor jugador. Tipo <valor>
+* final_score: El puntaje a asignar por acertar al resultado final del partido. Tipo <valor>
+* goal: El puntaje a asignar por acertar a que hubo un gol dentro de los ttps. Tipo <valor>
+*
+* Ejemplo:
+*
+* config/misc/30/20/1000/2000/1000
+*/
+Route::get('config/misc/{ttp}/{ttps}/{mvp}/{final_score}/{goal}', function($ttp, $ttps, $mvp, $final_score, $goal){
+    
+    DB::table('configurations')
+            ->where('id', 1)
+            ->update(array('ttp_normal' => $ttp,
+                'ttp_special' => $ttps,
+                'mvp' => $mvp,
+                'final_score' => $final_score,
+                'goal' => $goal,
+                'updated_at' => date('Y-m-d H:i:s')));    
+
+    return Response::json(array('status' => 'OK'));
+});
+
+Route::get('levels', function(){   
+
+    if(isset($_GET['level_id'])) {
+        $level_id = $_GET['level_id'];
+
+
+        $badges = DB::table('badge_levels')
+        ->where('badge_levels.level_id', '=', $level_id)
+        ->join('badges', 'badge_levels.badge_id', '=', 'badges.id')
+        ->select('badges.*')
+        ->get();
+
+
+        $levels = DB::table('levels')
+            ->where('levels.id', '=', $level_id)
+            ->join('badge_levels', 'badge_levels.level_id', '=', 'levels.id')
+            ->join('badges', 'badges.id', '=', 'badge_levels.badge_id')
+            ->select('levels.level', 'levels.points_required', 'badges.shares', 
+                'badges.name', 'badges.challenges', 'badges.incidence', 'badges.recurrence', 
+                'badges.points_gained', 'badges.must', 'badges.badge_type')
+            ->get();
+    } else {
+        $levels = Level::all();
+    }
+
+    return Response::json($levels);
+});
+
+/**
+* Las variables son del tipo :
+* Level_id: <valor>
+* Points: <valor, must>
+* Shares: <valor, puntos_a_ganar, must>
+* Challenges: <valor, puntos_a_ganar, must>
+* Play Now: <valor, puntos_a_ganar, must>
+* Recurrence: <valor, puntos_a_ganar, must>
+*
+*
+* Ejemplo:
+*
+* levels/update/2/2000,1/5,200,1/8,200,0/45,100,1/10,150,0
+*/
+Route::get('levels/update/{level_id}/{points}/{shares}/{challenges}/{incidences}/{recurrences}', function($level_id, $points, $shares, $challenges, $incidences, $recurrences){
+        
+    $point = explode(",", $points);
+    $p_v = $point[0];
+    $p_m = $point[1];
+
+    $share = explode(",", $shares);
+    $s_v = $share[0];
+    $s_p = $share[1];
+    $s_m = $share[2];
+
+    $challenge = explode(",", $challenges);
+    $c_v = $challenge[0];
+    $c_p = $challenge[1];
+    $c_m = $challenge[2];
+
+    $incidence = explode(",", $incidences);
+    $i_v = $incidence[0];
+    $i_p = $incidence[1];
+    $i_m = $incidence[2];
+
+    $recurrence = explode(",", $recurrences);
+    $r_v = $recurrence[0];
+    $r_p = $recurrence[1];
+    $r_m = $recurrence[2];
+
+    //puntos del nivel
+    if($p_m == 1) {
+        //es necesario
+        DB::table('levels')
+            ->where('id', '=', $level_id)
+            ->update(array('points_required' => $p_v));
+    } else {
+        DB::table('levels')
+            ->where('id', '=', $level_id)
+            ->update(array('points_required' => 0));
+    }
+
+    //busco si existe un badge_level con ese level id, si existe lo actualizo, si no lo creo
+    $badges = DB::table('badge_levels')
+        ->where('badge_levels.level_id', '=', $level_id)
+        ->join('badges', 'badge_levels.badge_id', '=', 'badges.id')
+        ->select('badges.*')
+        ->get();
+
+    foreach ($badges as $b) {
+        switch ($b->badge_type) {
+            case 0:
+                //Points
+                break;
+            case 1:
+                //Shares
+                DB::table('badges')
+                    ->where('id', '=', $b->id)
+                    ->update(array('shares' => $s_v,
+                        'points_gained' => $s_p,
+                        'must' => $s_m));
+                break;
+            case 2:
+                //Challenges
+                DB::table('badges')
+                    ->where('id', '=', $b->id)
+                    ->update(array('challenges' => $c_v,
+                        'points_gained' => $c_p,
+                        'must' => $c_m));
+                break;
+            case 3:
+                //Incidence
+                DB::table('badges')
+                    ->where('id', '=', $b->id)
+                    ->update(array('incidence' => $i_v,
+                        'points_gained' => $i_p,
+                        'must' => $i_m));
+                break;
+            case 4:
+                //Recurrence
+                DB::table('badges')
+                    ->where('id', '=', $b->id)
+                    ->update(array('recurrence' => $r_v,
+                        'points_gained' => $r_p,
+                        'must' => $r_m));
+                break;
+        }
+    }
+
+    return Response::json($badges);
+});
+
+Route::group(array('prefix' => 'api/'), function(){
+
+   /*
+    ---------------------------
+
+    X.- Incidencia Tipo
+
+        Y) Posibilidad id
+
+    ---------------------------
+
+    1.- Gol
+
+    2.- Tiro Libre
+
+        1) Gol
+        2) Atajada
+        3) Despeje
+        4) Fuera
+
+    3.- Corner
+
+        1) Gol
+        2) Atajada
+        3) Despeje
+        4) Fuera
+
+    4.- Penal
+
+        1) Superior derecha
+        2) Superior izquierda
+        3) Inferior derecha
+        4) Inferior izquierda
+        5) Al centro
+        6) Fuera
+        7) Atajada
+
+    5.- Jugador del partido
+
+        1) Id del jugador
+    */
+
+    Route::get('bet/{incidence_id}/{user_fb_id}/{possibility_id}/{bet_time}', function($incidence_id, $user_fb_id, $possibility_id, $bet_time){   
+        //buscamos al usuario
+        $user = User::where('user_fb_id', '=', $user_fb_id)->first();
+
+        //also we have to save the new number of bets made
+        $user->bets_made = $user->bets_made + 1;
+        //$user->bets_made = $newBetsMade;
+        $user->save();
+
+        $bet = new Bet();
+        $bet->done_at = date('Y-m-d H:i:s');
+        $bet->score = 0;
+        $bet->result = 0;
+        $bet->user_id = $user->id;
+        $bet->incidence_id = $incidence_id;
+        $bet->bet_to_possibility = $possibility_id;
+        $bet->save();        
+
+        return Response::json(array('message' => 'User ' . $user_fb_id . ' on incidence ' . $incidence_id . ' made a bet for ' . $possibility_id . ' at ' . $bet_time));
+    });
+
+    Route::get('special_bet/{incidence_id}/{user_fb_id}/{bet_time}', function($incidence_id, $user_fb_id, $bet_time){       
+        //buscamos al usuario
+        $user = User::where('user_fb_id', '=', $user_fb_id)->first();
+
+        //$incidence = Incidence::find($incidence_id);
+
+        //var_dump($incidence);
+
+        //$possibility = Possibilitie::where('incidence_type_id', '=', $incidence->type->id)->first();
+        $possibility = DB::table('incidences')
+            ->where('incidences.id', '=', $incidence_id)
+            ->join('incidence_types', 'incidence_types.id', '=', 'incidences.incidence_type_id')
+            ->join('possibilities', 'incidence_types.id', '=', 'possibilities.incidence_type_id')
+            ->select('possibilities.value')
+            ->first();
+
+        //var_dump($possibility);
+
+        $userCalculations = new UserCalculations();
+
+        //calculamos la ponderación del usuario en base a su nivel
+        $levelWeight = $userCalculations->getUserLevel($user_fb_id);
+
+        $beforeScore = $user->total_score;
+
+        //calculamos el puntaje ganado
+        $config = DB::table('configurations')
+            ->select('ttp_special')
+            ->first();
+        
+        $scoreGained = ($possibility->value) * $levelWeight->weight + ceil((($config->ttp_special - $bet_time)/$config->ttp_special) * (ceil($possibility->value / 10)));
+
+        $user->total_score += $scoreGained;
+
+        //also we have to save the new number of bets made and won
+        $user->bets_made = $user->bets_made + 1;
+        $user->bets_won = $user->bets_won + 1;
+
+        $user->save();
+
+        //vemos si ha desbloqueado nuevos badges
+        $userCalculations->checkForNewBadge($user->user_fb_id);
+
+        //vemos si el usuario ha subido de nivel
+        $ifNewLevel = $userCalculations->checkIfNewLevel($user, $beforeScore, $user->total_score);
+
+        //verificamos el nivel del usuario
+        $newUserLevel = $userCalculations->getUserLevel($user->user_fb_id);
+
+        if ($ifNewLevel) {
+            $ifNewLevel = "YES";
+        } else {
+            $ifNewLevel = "NO";
+        }
+
+        //POSIBILIDAD 18 PUES EN LA BASE DE DATOS EL 18 ES PARA TIPO INCIDENCIA 1 (GOL)
+        $possibility_id = 18;
+
+        $bet = new Bet();
+        $bet->done_at = date('Y-m-d H:i:s');
+        $bet->score = $scoreGained;
+        $bet->result = 1;
+        $bet->user_id = $user->id;
+        $bet->incidence_id = $incidence_id;
+        $bet->bet_to_possibility = $possibility_id;
+        $bet->save();        
+
+        return Response::json(array('new_level' => $ifNewLevel, "current_level" => $levelWeight->level, 
+            'score_gained' => $scoreGained, 'total_score' => $user->total_score));
+    });
+
+    Route::get('special_bet/result/{user_fb_id}/{result}/{player}', function($user_fb_id, $result, $player){
+        $user = User::where('user_fb_id', '=', $user_fb_id)->first();
+
+        if($user) {
+            $successResult = strcmp($result, "Y") === 0 ? true : false;
+            $successPlayer = strcmp($player, "Y") === 0 ? true : false;
+
+            if(!(strcmp($result, "-") === 0)) {
+                //also we have to save the new number of bets made and won
+                $user->bets_made = $user->bets_made + 1;
+            }
+
+            if(!(strcmp($player, "-") === 0)) {
+                //also we have to save the new number of bets made and won
+                $user->bets_made = $user->bets_made + 1;
+            }
+
+            $userCalculations = new UserCalculations();            
+
+            //calculamos el puntaje ganado
+            $config = DB::table('configurations')
+                ->select('final_score', 'mvp')
+                ->first();
+
+            //calculamos la ponderación del usuario en base a su nivel
+            $levelWeight = $userCalculations->getUserLevel($user_fb_id);
+
+            //si no le achuntamos a nada
+            if(!$successPlayer && !$successResult) {
+                return Response::json(array('new_level' => "NO", "current_level" => $levelWeight->level, 
+                'score_gained_result' => 0, 'score_gained_player' => 0, 'total_score' => $user->total_score, 'message' => 'No acertaste'));
+            }
+
+            $beforeScore = $user->total_score;
+
+            $scoreGainedPlayer = 0;
+            $scoreGainedResult = 0;
+
+            if($successResult) {
+                //si el usuario acerto al resultado, agregamos el puntaje
+                $scoreGainedResult = ($config->final_score) * $levelWeight->weight ;
+
+                $user->total_score += $scoreGainedResult;
+                $user->bets_won = $user->bets_won + 1;
+            }
+
+            if($successPlayer) {
+                //si el usuario acerto al jugador, agregamos el puntaje
+                $scoreGainedPlayer = ($config->mvp) * $levelWeight->weight ;
+
+                $user->total_score += $scoreGainedPlayer;
+                $user->bets_won = $user->bets_won + 1;
+            }            
+
+            $user->save();
+
+            //vemos si ha desbloqueado nuevos badges
+            $userCalculations->checkForNewBadge($user->user_fb_id);
+
+            //vemos si el usuario ha subido de nivel
+            $ifNewLevel = $userCalculations->checkIfNewLevel($user, $beforeScore, $user->total_score);
+
+            //verificamos el nivel del usuario
+            $newUserLevel = $userCalculations->getUserLevel($user->user_fb_id);
+
+            if ($ifNewLevel) {
+                $ifNewLevel = "YES";
+            } else {
+                $ifNewLevel = "NO";
+            }
+
+            return Response::json(array('new_level' => $ifNewLevel, "current_level" => $levelWeight->level, 
+                'score_gained_result' => $scoreGainedResult, 'score_gained_player' => $scoreGainedPlayer, 'total_score' => $user->total_score, 'message' => 'Has ganado ' . ($scoreGainedResult + $scoreGainedPlayer) . ' puntos!'));
+        } else {
+            return Response::json(array('message' => 'No existe usuario con id ' . $user_fb_id));
+        }
+    });
+
+    Route::get('devices', function(){
+        $devices = Device::all();
+        $tokens = array();
+        foreach ($devices as $device) {
+            array_push($tokens, $device->token);
+        }
+        Response::json($tokens);
+    });
+
+    Route::get('match/incidences/{match_id}/', function($match_id){
+        $incidences = DB::table('incidences')
+            ->where('incidences.match_id','=',$match_id)
+            ->join('teams', 'incidences.team_id', '=', 'teams.id')
+            ->join('incidence_types', 'incidence_types.id', '=', 'incidences.incidence_type_id')
+            ->select('incidences.id as incidence_id', 
+                'incidences.happened_at', 
+                'incidences.match_time', 
+                'incidences.message', 
+                'incidences.incidence_type_id', 
+                'incidences.incidence_state_id', 
+                'incidences.match_id', 
+                'teams.id as team_id', 
+                'incidences.occurred_possibility',
+                'teams.name as team_name')
+            ->orderBy('incidences.happened_at', 'desc')
+            ->distinct()
+            ->get();               
+
+        return Response::json($incidences);
+    });
+
+    Route::get('match/incidences/{match_id}/{user_fb_id}', function($match_id, $user_fb_id){
+        $incidences = DB::table('incidences')
+            ->where('incidences.match_id','=',$match_id)
+            ->join('teams', 'incidences.team_id', '=', 'teams.id')
+            ->join('incidence_types', 'incidence_types.id', '=', 'incidences.incidence_type_id')
+            ->select('incidences.id as incidence_id', 
+                'incidences.happened_at', 
+                'incidences.match_time', 
+                'incidences.message', 
+                'incidences.incidence_type_id', 
+                'incidences.incidence_state_id', 
+                'incidences.match_id', 
+                'teams.id as team_id', 
+                'incidences.occurred_possibility',
+                'teams.name as team_name')
+            ->orderBy('incidences.happened_at', 'desc')
+            ->distinct()
+            ->get();        
+
+        $bets = array();
+
+        $user = User::where('user_fb_id', '=', $user_fb_id)
+            ->select('*')
+            ->first();
+
+        foreach ($incidences as $in) {
+            $bet = DB::table('bets')
+                ->where('user_id','=', (int) $user->id)
+                ->where('incidence_id', '=', (int) $in->incidence_id)
+                ->select('*')
+                ->first();
+
+            if(!is_null($bet))
+                array_push($bets, $bet);
+        }
+
+        return Response::json(array('incidences' => $incidences, 'bets' => $bets));
+    });
+
+    Route::get('match/incidence/{incidence_id}/{occurred_possibility}/{user_fb_id}', function($incidence_id, $occurred_possibility, $user_fb_id){
+        $incidences = DB::table('incidences')
+            ->where('incidences.id','=', $incidence_id)
+            ->where('possibilities.id','=', $occurred_possibility)
+            ->join('teams', 'incidences.team_id', '=', 'teams.id')
+            ->join('incidence_types', 'incidence_types.id', '=', 'incidences.incidence_type_id')
+            ->join('possibilities', 'incidence_types.id', '=', 'possibilities.incidence_type_id')
+            ->select(array(
+                'incidences.id as incidence_id', 
+                'incidences.happened_at', 
+                'incidences.match_time', 
+                'incidences.message', 
+                'incidences.incidence_type_id', 
+                'incidences.incidence_state_id', 
+                'incidences.match_id', 
+                'teams.id as team_id', 
+                'incidences.occurred_possibility',
+                'possibilities.value',
+                'teams.name as team_name'))
+            ->orderBy('incidences.happened_at', 'desc')
+            ->get(array('possibilities.value'));
+
+        $bets = array();
+
+        $user = User::where('user_fb_id', '=', $user_fb_id)
+            ->select('*')
+            ->first();
+
+        foreach ($incidences as $in) {
+            $bet = DB::table('bets')
+                ->where('user_id','=', (int) $user->id)
+                ->where('incidence_id', '=', (int) $in->incidence_id)
+                ->select('*')
+                ->first();
+
+            if(!is_null($bet))
+                array_push($bets, $bet);
+        }
+
+        return Response::json(array('incidences' => $incidences, 'bets' => $bets));
+    });
+
+    Route::get('match/detail/incidences/{match_id}/{user_fb_id}', function($match_id, $user_fb_id){
+
+        $user = User::where('user_fb_id', '=', $user_fb_id)->first();
+        
+        $incidences = DB::table('incidences')
+            ->where('incidences.match_id', '=', $match_id)
+            ->join('incidence_types', 'incidence_types.id', '=', 'incidences.incidence_type_id')
+            ->join('bets', function($join) {
+                    $join->on('bets.incidence_id', '=', 'incidences.id');
+                    $join->on('bets.user_id', '=', $user->id);
+                })
+            ->join('possibilities', 'possibilities.incidence_type_id', '=', 'incidence_types.id')
+            ->select('incidence_types.name', 'bets.score')
+            ->orderBy('incidences.happened_at', 'desc')
+            ->get();
+
+        return Response::json(array('incidences' => $incidences));
+    });
+
+    Route::get('match/incidence/possibilities', function(){
+        
+        $possibilities = DB::table('possibilities')
+            ->select('possibilities.id', 'possibilities.name', 'possibilities.value', 'possibilities.incidence_type_id')
+            ->orderBy('possibilities.id')
+            ->get();
+
+        return Response::json($possibilities);
+    });
+
+    Route::get('history/{user_fb_id}', function($user_fb_id){
+        //we get the user by facebook id
+        $id_user = User::where('user_fb_id', '=', $user_fb_id)
+            ->select('id')
+            ->first();
+
+        //if the user exists
+        if($id_user != null) {
+            $id_user= $id_user->id;
+
+            $partidos = DB::table('user_in_matches')
+                ->where('user_id', '=', $id_user)
+                ->get();
+
+            $resultados = DB::table('team_in_matches')
+                ->get();
+
+            $bets = DB::table('bets')
+                ->where('user_id', '=', $id_user)
+                ->join('incidences', 'bets.incidence_id', '=', 'incidences.id')
+                ->join('possibilities', 'possibilities.id', '=', 'bets.bet_to_possibility')
+                ->select('bets.id', 'bets.result', 'bets.score', 'bets.incidence_id', 'incidences.message', 
+                    'possibilities.name', 'incidences.match_time')
+                ->get();
+           
+            $response = array();
+            $matches = Match::orderBy('begin_at', 'desc')
+                ->get();
+            $matches->load('stadium');
+            $matches->load('teams');
+
+            foreach ($partidos as $partido) {
+                foreach ($matches as $match) {
+                    if($partido->match_id==$match->id){
+                        foreach ($resultados as $resultado) {
+                            if($resultado->match_id==$match->id && $resultado->team_id==$match->teams[0]->id ){$score_1=$resultado->score;}
+                            if($resultado->match_id==$match->id && $resultado->team_id==$match->teams[1]->id ){$score_2=$resultado->score;} 
+                        }
+                        array_push($response, array('match_id' => $match->id, 'begin_at' => $match->begin_at, 'programmed_to' => $match->programmed_to, 'team_0' => array('id' => $match->teams[0]->id, 'name' =>$match->teams[0]->name,'score'=>$score_1,'escudo'=>$match->teams[0]->escudo), 'team_1' => array('id' => $match->teams[1]->id, 'name' => $match->teams[1]->name,'score'=>$score_2,'escudo'=>$match->teams[1]->escudo), 'stadium' => array('id' => $match->stadium->id, 'img' => asset('img/stadium/' . $match->stadium->id . '.png'), 'name' => $match->stadium->name)));
+                    }
+                }
+            }
+            return Response::json(array('matches' => $response, 'bets'=>$bets));
+        } else {
+            return Response::json(array('status' => 'no_history'));
+        }
+    });
+
+    /**
+    * gets the next matches counting from today
+    */
+    Route::get('matches/list', function(){
+        $response = array();
+
+        $matches = Match::where('programmed_to', '>=' , date('Y-m-d'))
+            ->orderBy('programmed_to', 'asc')
+            ->get();
+        $matches->load('stadium');
+        $matches->load('teams');
+
+        foreach ($matches as $match) {
+            array_push($response, array('match_id' => $match->id, 
+                'programmed_to' => $match->programmed_to, 
+                'team_0' => array('id' => $match->teams[0]->id, 
+                    'name' =>$match->teams[0]->name,
+                    'escudo' => $match->teams[0]->escudo), 
+                'team_1' => array('id' => $match->teams[1]->id, 
+                    'name' => $match->teams[1]->name,
+                    'escudo' => $match->teams[1]->escudo), 
+                'stadium' => array('id' => $match->stadium->id, 
+                    'img' => asset('img/stadium/' . $match->stadium->id . '.png'), 
+                    'name' => $match->stadium->name)));
+        }
+
+        return Response::json(array('matches' => $response));      
+    });
+
+    Route::get('notification/delay/{notification_id}', function($notification_id){
+        $notification = Notification::find($notification_id);
+        $now = new DateTime(date('Y-m-d H:i:s'));
+        $notification_time = new DateTime($notification->sent_at);
+        $delta_time = $notification_time->diff($now);
+        $notification->delay = bcadd($delta_time->s, '0', 3);
+        $notification->save();
+        return Response::json(array('status' => 'success'));
+    });
+
+    Route::get('play_match/{match_id}/{user_fb_id}', function($match_id, $user_fb_id){
+        $message = '';
+        $match = Match::find($match_id);
+        $match->load('stadium');
+        $user = User::where('user_fb_id', '=', $user_fb_id)->first();
+        
+        if(isset($match)) {
+            if(isset($user)) {
+                $already_plays = User_in_match::whereRaw('user_id = ' . $user->id . ' and match_id = ' . $match->id)->first();
+                if(!isset($already_plays)) {
+                    $he_is_playing_now = new User_in_match();
+                    $he_is_playing_now->user_id = $user->id;
+                    $he_is_playing_now->match_id = $match->id;
+                    $he_is_playing_now->save();
+
+                    //also we have to save the new number of games played
+                    $user->games_played = $user->games_played + 1;
+                    //$user->games_played = $newGamesPlayed;
+                    $user->save();
+
+                    $message = 'User ' . $user_fb_id . ' is playing now';
+                } else {
+                    $message = 'User already plays';
+                }
+            } else {
+                $message = 'User not found';
+            }
+        } else {
+            $message = 'Match not found';
+        }
+
+        $userCalculations = new UserCalculations();
+
+        //primer buscamos si ha ganado nuevos badges
+        $userCalculations->checkForNewBadge($user_fb_id);
+
+        //vemos su nuevo nivel
+        $newUserLevel = $userCalculations->getUserLevel($user_fb_id);
+
+        $ifNewLevel = $userCalculations->checkIfNewLevel($user, $user->total_score, $user->total_score);
+
+        //convertimos a mensaje "leible"
+        if ($ifNewLevel) {
+            $ifNewLevel = "YES";
+        } else {
+            $ifNewLevel = "NO";
+        }
+
+        $response = array(
+            'id' => $user_fb_id,
+            'total_score' => (int) $user->total_score,
+            'games_played' => (int) $user->games_played,
+            'new_level_gained' => $ifNewLevel,
+            'user_level' => $newUserLevel
+        );
+
+        return Response::json(array('message' => $message, 'user' => $response, 'match' => array('stadium' => array('id' => $match->stadium->id, 'img' => asset('img/stadium/' . $match->stadium->id . '.png'), 'name' => $match->stadium->name))));
+    });    
+
+    /*
+    Route::get('static_bet/1/{user_fb_id}/{delta_time}', function($user_fb_id, $delta_time){
+        $score = ($delta_time*30);
+        $score = ($score < 0 ? 0 : $score);
+        return Response::json(array('message' => 'Ganaste ' . $score . ' puntos!', 'score' => $score));
+    });
+    */    
+
+    /**
+    * Function called to register and make login to FullPass.
+    *
+    * @param string $user_email: the user's email
+    * @param string $user_fb_di: the user's facebook id
+    * @param string $device_token: the user's device token for future push messages
+    * @param string $type: the smartphones type (Android or iOS)
+    *
+    * @return a json array.
+    *       {
+    *       "status": "exist",
+    *       "user": {
+    *           "email": "armando.casas@gmail.com",
+    *           "user_fb_id": "123456789",
+    *           "name": "Armando Casas",
+    *           "total_score": 0,
+    *           "level": "1",
+    *           "next_level": "2",
+    *           "percentage": 0,
+    *           "ranking": 3,
+    *           "tokens": 0,
+    *           "number_goals": 1,
+    *           "user_badges": {
+    *               "id": 2,
+    *               "name": "Shares 1",
+    *               "img_url": "img/badges/128/RoundIcons-Free-Set-35.png",
+    *               "shares": 10,
+    *               "challenges": 0,
+    *               "incidence": 0,
+    *               "recurrence": 0,
+    *               "updated_at": "2014-04-01 20:29:33",
+    *               "created_at": "2014-04-01 20:29:33",
+    *               "points_gained": 100,
+    *               "must": 0,
+    *               "badge_type": 1,
+    *               "level": "1"
+    *               },
+    *           "other_badges": [],
+    *           "ttp_normal": 20,
+    *           "ttp_special": 20
+    *       }
+    */
+    Route::get('user/new', function(){
+        $status = 'fail';
+
+        $user_data = array('email' => $_GET['user_email'], 'user_fb_id' => $_GET['user_fb_id'], 
+            'updated_at' => date('Y-m-d H:i:s'));
+        $device_data = array('token' => $_GET['device_token'],'type' => $_GET['device_type']);
+        
+        $user_validation = Validator::make($user_data, User::$rules);
+        $device_validation = Validator::make($device_data, Device::$rules);
+
+        //we retrieve the user from the DB
+        $user = User::where('user_fb_id', '=', $user_data['user_fb_id'])->first();
+
+        $userCalculations = new UserCalculations();
+
+        $config = DB::table('configurations')
+            ->select('ttp_normal', 'ttp_special')
+            ->first();
+
+        if($user != null) {
+            //if the user already exists, we update the respective fields
+            $devices= DB::table('devices')->where('id','=', $user->id)->update($device_data);
+            $devices= DB::table('users')->where('id','=', $user->id)->update($user_data);            
+
+            //we get the current user's level
+            $userCurrentLevel = $userCalculations->getUserLevel($user->user_fb_id);
+
+            $userNextLevel = $userCalculations->getUserNextLevel($userCurrentLevel->level)->level;
+
+            $user_data = array('email' => $user->email, 
+                'user_fb_id' => $user->user_fb_id, 
+                'name' => ($user->first_name . " " . $user->last_name), 
+                'total_score'=> $user->total_score, 
+                'level' => $userCurrentLevel->level, 
+                'next_level' => $userNextLevel,
+                'percentage' => $userCalculations->getPercentageToNextLevel($userCurrentLevel->level, $user->total_score), 
+                'ranking' => $userCalculations->getUserOverallRanking($user->user_fb_id),                 
+                'tokens' => $userCalculations->getUserTokens($user->total_score),                
+                'number_goals' => $userCurrentLevel->number_goals,
+                'user_badges' => $userCalculations->checkForNewBadge($user->user_fb_id),
+                'other_badges' => $userCalculations->getNotObtainedBadges($user->user_fb_id),
+                'ttp_normal' => $config->ttp_normal,
+                'ttp_special' => $config->ttp_special);
+
+            return Response::json(array('status' => 'exist', 'user' => $user_data));
+        }
+        if(!$user_validation->passes()){
+            return Response::json(array('status' => 'user_validation bad'));
+        }
+        if(!$device_validation->passes()){
+            return Response::json(array('status' => 'device_validation bad'));
+        }
+        if($user_validation->passes() && $device_validation->passes()) {
+            //if it's a new user we have to initialize everything
+
+            $user_fb_id = $_GET['user_fb_id'];
+            $first_name = $_GET['first_name'];
+            $last_name = $_GET['last_name'];
+
+            $user_data = array('email' => $_GET['user_email'], 
+                'first_name' => $first_name, 
+                'last_name' => $last_name, 
+                'user_fb_id' => $user_fb_id, 
+                'total_score'=> 0);                        
+
+            // the ranking is going to be the total number of users plus 1
+            $ranking = DB::table('users')->count();
+
+            //DB::select('SELECT COUNT(id) AS ranking FROM users');
+            $ranking = $ranking + 1;
+
+            //we get the current user's level
+            $userCurrentLevel = "1";
+
+            $userNextLevel = "2";//$userCalculations->getUserNextLevel($userCurrentLevel)->level;
+
+            $badges = DB::table('badges')
+                ->select(array('badges.*', 'levels.level'))             
+                ->join('badge_levels', 'badges.id', '=', 'badge_levels.badge_id')
+                ->join('levels', 'levels.id', '=', 'badge_levels.level_id')
+                ->groupBy('badges.id', 'levels.level')
+                ->orderBy('badges.id', 'asc')
+                ->get();
+
+            $return_user_data = array('email' => $_GET['user_email'], 
+                'user_fb_id' => $user_fb_id, 
+                'name' => ($first_name . " " . $last_name), 
+                'total_score'=> 0, 
+                'level' => $userCurrentLevel, 
+                'next_level' => $userNextLevel,
+                'percentage' => 0, 
+                'ranking' => $ranking, 
+                'tokens' => 0,
+                'number_goals' => 1,
+                'user_badges' => array(),
+                'other_badges' => $badges,                 
+                'ttp_normal' => $config->ttp_normal,
+                'ttp_special' => $config->ttp_special); 
+
+            $user = User::create($user_data);
+            $u_level = array('level_id' => 1, 'user_id' => $user->id, 'date_obtained' => date('Y-m-d_H:i:s'));
+            $user_level = User_level::create($u_level);
+            $device = new Device($device_data);
+            $user->devices()->save($device);                   
+
+            return Response::json(array('status' => 'success', 'user' => $return_user_data));
+        }
+
+        return Response::json(array('status' => $status));
+    });
+
+    /**
+    * Gets the overall ranking of users.
+    * @param integer $limit: the limit of users to display
+    * @param string $user_fb_id: the user's facebook id
+    */
+    Route::get('user/ranking/{limit}/{user_fb_id}', function($limit, $user_fb_id){
+        $users = User::orderBy('total_score', 'desc')
+            ->select('user_fb_id', 'first_name', 'last_name', 'total_score')
+            ->orderBy('games_played', 'desc')
+            ->take($limit)
+            ->get();
+
+        $allUsers = array();
+        $userFound = false;
+
+        foreach($users as $u) {
+
+            $usuario = array('user_fb_id' => $u->user_fb_id, 
+                'first_name' => $u->first_name,
+                'last_name' => $u->last_name,
+                'total_score' => $u->total_score);
+
+            array_push($allUsers, $usuario);
+
+            if(strcmp($u->user_fb_id, $user_fb_id) === 0)
+                $userFound = true;
+        }
+
+        $response = array(
+            'users' => $allUsers            
+        );
+
+        if(!$userFound){
+            //si no hemos encontrado al usuario todavía, tenemos que retornarlo al final
+            $me = User::where('user_fb_id', '=', $user_fb_id)
+                ->select('user_fb_id', 'first_name', 'last_name', 'total_score')
+                ->first();
+
+            $userCalculations = new UserCalculations();
+            $ranking = $userCalculations->getUserOverallRanking($user_fb_id);
+
+            $usuario = array('user_fb_id' => $me->user_fb_id, 
+                'first_name' => $me->first_name,
+                'last_name' => $me->last_name,
+                'total_score' => $me->total_score,
+                'ranking' => $ranking);
+            
+            $response['me'] = $usuario;
+        } else {
+            $response['me'] = null;
+        }
+
+        return Response::json($response);
+    });
+
+    Route::get('user/push', function(){
+        $notificationSender = new SendNotification();
+
+        $alert = 'Prueba de push';
+
+        $config = DB::table('configurations')
+            ->select('ttp_normal')
+            ->first();    
+
+        $metadata = array(
+            'push_type' => 'incidencia',
+            'type_id' => (int) 2,
+            'match_id' => (int) 2,
+            'team_id' => (int) 2,
+            'team_name' => 'Chile',
+            'incidence_id' => (int) 701,
+            'server_time' => date('Y-m-d H:i:s'),
+            'match_time' => date('Y-m-d H:i:s'),
+            'incidence_duration' => (int) $config->ttp_normal);
+
+        // Enviar notificaciones 
+        $devices = Device::all();
+
+        $android_push_array = array();
+        $ios_push_array = array();
+
+        $message = new ApnsPHP_Message();
+        $message -> setBadge(-1);
+        $message -> setText($alert);
+        $message -> setSound();
+
+        $message -> setCustomProperty('push_type', 'incidencia');
+        $message -> setCustomProperty('type_id', (int) 2);
+        $message -> setCustomProperty('match_id', (int) 2);
+        $message -> setCustomProperty('team_id', (int) 2);
+        $message -> setCustomProperty('team_name', 'Chile');
+        $message -> setCustomProperty('incidence_id', (int) 701);
+        $message -> setCustomProperty('server_time', date('Y-m-d H:i:s'));
+        $message -> setCustomProperty('match_time', date('Y-m-d H:i:s'));
+        $message -> setCustomProperty('incidence_duration', (int) $config->ttp_normal);
+
+        // Set the expiry value to 30 seconds
+        $message -> setExpiry((int) $config->ttp_normal);
+
+        //we iterate through each device
+        foreach ($devices as $device) {
+            $notification = new Notification();
+            $notification->sent_at = date('Y-m-d H:i:s');
+            $notification->message = $alert;
+            $notification->some_id = $incidence_type_id;
+            $notification->user_id = $device->user_id;
+            
+            $metadata['notification_id'] = $notification->id;
+
+            if (strcmp($device->type, "android") === 0) {
+                array_push($android_push_array, $device->token);
+            } else {
+                array_push($ios_push_array, $device->token);
+            }                 
+        }
+
+        if(count($ios_push_array) > 0) {
+            $notificationSender->sendIOS($ios_push_array, $message);
+        }
+
+        //Se envía a todos los usuarios Android
+        if (count($android_push_array) > 0) {
+            $notificationSender->sendAndroid($android_push_array, $metadata, $alert);
+        }
+
+        return Response::json($metadata);
+    });
+
+    /**
+    * Gets the ranking of all user's facebook friends
+    * @param string $facebook_friends_id: a String containing all facebook id's separated by the '-' character
+    * @param integer $limit: the limit of results expected
+    */
+    Route::post('user/friends/ranking', function(){
+        //facebook_friends_id is a string separated by -
+        //we obtain a array of facebook ids
+        $all_friends = explode("-", $_POST['facebook_friends_id']);
+
+        //first we filter all facebook id's, then we order it by their score and we get the $limit
+        $dbUsers = DB::table('users')
+            ->select('*')
+            ->whereIn('user_fb_id', $all_friends)
+            ->orderBy('total_score', 'desc')
+            ->orderBy('games_played', 'desc')
+            ->take($_POST['limit'])
+            ->get();
+
+        $users = array();
+
+        $userCalculations = new UserCalculations();            
+
+        foreach ($dbUsers as $u) {
+
+            $userCurrentLevel = $userCalculations->getUserLevel($u->user_fb_id);
+
+            $user = array(
+                'user_fb_id' => $u->user_fb_id,
+                'first_name' => $u->first_name, 
+                'last_name' => $u->last_name,
+                'total_score'=> $u->total_score, 
+                'level' => $userCurrentLevel->level, 
+                'percentage_next_level' => $userCalculations->getPercentageToNextLevel($userCurrentLevel->level, $u->total_score), 
+                'games_played' => $u->games_played, 
+                'bets_made' => $u->bets_made);   
+
+            array_push($users, $user);
+        }
+
+
+        return Response::json(array('response' => $users));
+    });
+
+    /**
+    * Increments the number of shares by 1
+    * @param user_fb_id: the users facebook id
+    */
+    Route::get('user/share/{user_fb_id}', function($user_fb_id){
+
+        $user = User::where('user_fb_id', '=', $user_fb_id)->first();
+        //we save the new number of shares made
+        $user->shares_made = $user->shares_made + 1;
+        //$newSharesMade++;
+        //$user->shares_made = $newSharesMade;
+        $user->save();
+
+        $userCalculations = new UserCalculations();
+
+        //primer buscamos si ha ganado nuevos badges
+        $userCalculations->checkForNewBadge($user->user_fb_id);
+
+        //vemos su nuevo nivel
+        $newUserLevel = $userCalculations->getUserLevel($user->user_fb_id);
+
+        $ifNewLevel = $userCalculations->checkIfNewLevel($user, $user->total_score, $user->total_score);
+
+        //convertimos a mensaje "leible"
+        if ($ifNewLevel) {
+            $ifNewLevel = "YES";
+        } else {
+            $ifNewLevel = "NO";
+        }
+
+        $response = array(
+            'id' => $user->user_fb_id,
+            'total_score' => (int) $user->total_score,
+            'shares' => (int) $user->shares_made,
+            'new_level_gained' => $ifNewLevel,
+            'user_level' => $newUserLevel
+        );
+
+        return Response::json(array('response' => $response));
+    });
+
+    Route::get('match/details/{match_id}', function($match_id){
+        $match = Match::find($match_id);
+        $match->load('teams');     
+
+        $minutos = 0;
+        $segundos = 0;
+
+        if($match->match_state_id == 2){    
+            $start_date = new DateTime($match->begin_at);
+            $since_start = $start_date->diff(new DateTime(date('Y-m-d H:i:s')));    
+            $minutos = $since_start->i;
+            $segundos = $since_start->s;        
+        }
+        if($match->match_state_id == 4){
+            $start_date = new DateTime($match->second_time_begin_at);
+            $since_start = $start_date->diff(new DateTime(date('Y-m-d H:i:s')));
+            $minutos = $since_start->i;
+            $segundos = $since_start->s;
+        }
+        if($match->match_state_id == 6){
+            $start_date = new DateTime($match->first_overtime_begin_at);
+            $since_start = $start_date->diff(new DateTime(date('Y-m-d H:i:s')));   
+            $minutos = $since_start->i;
+            $segundos = $since_start->s;      
+        }
+        if($match->match_state_id == 8){
+            $start_date = new DateTime($match->second_overtime_begin_at);
+            $since_start = $start_date->diff(new DateTime(date('Y-m-d H:i:s')));
+            $minutos = $since_start->i;
+            $segundos = $since_start->s;
+        }        
+
+        $match->match_state_id = $match->match_state_id + 1;
+
+        $match['match_time'] = $minutos.":".$segundos;
+
+        //$match=date('Y-m-d H:i:s');
+        /*$team0_in_match = Team_in_match::whereRaw('match_id = ' . $match->id . ' and team_id = ' . $match->teams[0])->first();
+        $team1_in_match = Team_in_match::whereRaw('match_id = ' . $match->id . ' and team_id = ' . $match->teams[1])->first();
+        Response::json(array('match' => array('id' => $match->id, 'teams' => array())));*/
+        return Response::json($match);
+    });
+
+    Route::get('user/next_level_badges/{user_fb_id}', function($user_fb_id){
+
+        $userCalculations = new UserCalculations();
+
+        $user = User::where('user_fb_id', '=', $user_fb_id)->first();
+
+        $userCurrentLevel = $userCalculations->getUserLevel($user->user_fb_id);
+
+        $userNextLevel = $userCalculations->getUserNextLevel($userCurrentLevel->level)->id;
+
+        //var_dump($userNextLevel);
+
+        $nextLevelBadges = $userCalculations->getNextLevelBadges($userNextLevel);
+
+        //var_dump($nextLevelBadges);
+
+        $userCurrentBadges = $userCalculations->getUsersBadges($user->user_fb_id);
+
+        $array_nextLevelBadges = array();
+
+        foreach ($nextLevelBadges as $nlb) {
+            //echo "next badge: " . $nlb->badge_id;
+            array_push($array_nextLevelBadges, $nlb->badge_id);
+        }
+
+        /*
+        $array_userBadges = array();
+
+        foreach ($userCurrentBadges as $nlb) {
+            //echo "user badge: " . $nlb->id;
+            array_push($array_userBadges, $nlb->id);
+        } 
+        */    
+
+        //echo "badges usuario: ";
+        //var_dump($array_userBadges);
+
+        $allBadges = array();
+
+        $allServerBadges = Badge::all();
+
+        foreach ($allServerBadges as $badge) {
+
+            $isNext = in_array($badge->id, $array_nextLevelBadges);
+            //$userHasIt = in_array($badge->id, $array_userBadges);
+
+            //si el badge esta en el siguiente nivel pero NO lo tiene el usuario
+            if($isNext){
+                $otherBadge = array('id' => $badge->id, 
+                    'name' => $badge->name,
+                    'img_url' => $badge->img_url,
+                    'shares' => $badge->shares,
+                    'challenges' => $badge->challenges,
+                    'incidence' => $badge->incidence,
+                    'recurrence' => $badge->recurrence,
+                    'points' => $badge->points,
+                    'date_obtained' => null);
+                array_push($allBadges, $otherBadge);
+            }
+        }
+
+        return Response::json(array('next_level_badges' => $allBadges));
+    });
+
+    Route::get('user/friends/get_details/{user_fb_id}', function($user_fb_id){
+        
+        $user = DB::table('users')
+            ->where('user_fb_id', '=', $user_fb_id)
+            ->select('first_name', 'last_name', 'games_played', 'bets_made')
+            ->first();
+
+        $userCalculations = new UserCalculations();
+        $userCurrentLevel = $userCalculations->getUserLevel($user_fb_id);
+
+        $jsonuser = array(
+                'first_name' => $user->first_name, 
+                'last_name' => $user->last_name,
+                'level' => $userCurrentLevel->level, 
+                'games_played' => $user->games_played, 
+                'bets_made' => $user->bets_made);   
+
+        return Response::json(array('user' => $jsonuser));
+    });
+
+    Route::get('user/gamification/{user_fb_id}', function($user_fb_id){
+
+        $user = User::where('user_fb_id', '=', $user_fb_id)->first();
+        //we save the new number of shares made        
+
+        $userCalculations = new UserCalculations();
+
+        //primer buscamos si ha ganado nuevos badges
+        $userCalculations->checkForNewBadge($user_fb_id);
+
+        //vemos su nuevo nivel
+        $newUserLevel = $userCalculations->getUserLevel($user_fb_id);
+
+        $ifNewLevel = $userCalculations->checkIfNewLevel($user, $user->total_score, $user->total_score);
+
+        //convertimos a mensaje "leible"
+        if ($ifNewLevel) {
+            $ifNewLevel = "YES";
+        } else {
+            $ifNewLevel = "NO";
+        }
+
+        $response = array(
+            'id' => $user->user_fb_id,
+            'total_score' => (int) $user->total_score,
+            'shares' => (int) $user->shares_made,
+            'new_level_gained' => $ifNewLevel,
+            'user_level' => $newUserLevel
+        );
+
+        return Response::json(array('response' => $response));
+    });
+
+});

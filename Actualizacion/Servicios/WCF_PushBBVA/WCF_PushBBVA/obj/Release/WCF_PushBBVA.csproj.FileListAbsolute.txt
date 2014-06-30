@@ -1,0 +1,80 @@
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.pdb
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.pdb
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.pdb
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\obj\Release\WCF_PushBBVA.csprojResolveAssemblyReference.cache
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\obj\Release\WCF_PushBBVA.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\obj\Release\WCF_PushBBVA.pdb
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Core.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Apple.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Android.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\WCF_PushBBVA\bin\Newtonsoft.Json.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Core.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Apple.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Android.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Newtonsoft.Json.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\obj\Release\WCF_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\obj\Release\WCF_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Mono.Security.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Npgsql.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Npgsql.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Npgsql.xml
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\de\Npgsql.resources.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\es\Npgsql.resources.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\fi\Npgsql.resources.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\fr\Npgsql.resources.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\ja\Npgsql.resources.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\zh-CN\Npgsql.resources.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\obj\Release\WCF_PushBBVA.csprojResolveAssemblyReference.cache
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.pdb
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Newtonsoft.Json.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Android.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Apple.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Core.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.pdb
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.pdb
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Newtonsoft.Json.xml
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Android.pdb
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Apple.pdb
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Core.pdb
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\obj\Release\WCF_PushBBVA.csprojResolveAssemblyReference.cache
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\obj\Release\WCF_PushBBVA.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\obj\Release\WCF_PushBBVA.pdb
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Mono.Security.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Npgsql.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Npgsql.pdb
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Npgsql.xml
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\de\Npgsql.resources.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\es\Npgsql.resources.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\fi\Npgsql.resources.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\fr\Npgsql.resources.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\ja\Npgsql.resources.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\zh-CN\Npgsql.resources.dll
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.dll
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\WCF_PushBBVA.pdb
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.dll
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.dll
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Newtonsoft.Json.dll
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Android.dll
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Apple.dll
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Core.dll
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Connection_PushBBVA.pdb
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.pdb
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Newtonsoft.Json.xml
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Android.pdb
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Apple.pdb
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Core.pdb
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\obj\Release\WCF_PushBBVA.dll
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\obj\Release\WCF_PushBBVA.pdb
+\\psf\Home\Github\Actualizacion\Servicios\WCF_PushBBVA\WCF_PushBBVA\obj\Release\WCF_PushBBVA.csprojResolveAssemblyReference.cache

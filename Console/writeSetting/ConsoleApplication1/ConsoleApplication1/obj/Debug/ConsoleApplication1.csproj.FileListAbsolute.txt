@@ -1,0 +1,5 @@
+Z:\Github\BBVA\Console\writeSetting\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe.config
+Z:\Github\BBVA\Console\writeSetting\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
+Z:\Github\BBVA\Console\writeSetting\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
+Z:\Github\BBVA\Console\writeSetting\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleApplication1.exe
+Z:\Github\BBVA\Console\writeSetting\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleApplication1.pdb

@@ -101,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\PublishProfiles\Nuevo.pubxml" />
+    <None Include="Properties\PublishProfiles\Publicacion.pubxml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -115,7 +116,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>49167</DevelopmentServerPort>
+          <DevelopmentServerPort>49244</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>

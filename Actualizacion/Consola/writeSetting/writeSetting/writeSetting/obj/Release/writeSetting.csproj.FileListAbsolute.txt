@@ -1,0 +1,12 @@
+Z:\Github\BBVA\Console\writeSetting\writeSetting\writeSetting\bin\Release\writeSetting.exe.config
+Z:\Github\BBVA\Console\writeSetting\writeSetting\writeSetting\bin\Release\writeSetting.exe
+Z:\Github\BBVA\Console\writeSetting\writeSetting\writeSetting\bin\Release\writeSetting.pdb
+Z:\Github\BBVA\Console\writeSetting\writeSetting\writeSetting\obj\Release\writeSetting.exe
+Z:\Github\BBVA\Console\writeSetting\writeSetting\writeSetting\obj\Release\writeSetting.pdb
+Z:\Github\Actualizacion\Consola\writeSetting\writeSetting\writeSetting\bin\Release\writeSetting.exe.config
+Z:\Github\Actualizacion\Consola\writeSetting\writeSetting\writeSetting\bin\Release\writeSetting.exe
+Z:\Github\Actualizacion\Consola\writeSetting\writeSetting\writeSetting\bin\Release\writeSetting.pdb
+Z:\Github\Actualizacion\Consola\writeSetting\writeSetting\writeSetting\bin\Release\libEmailSpartacus.dll
+Z:\Github\Actualizacion\Consola\writeSetting\writeSetting\writeSetting\bin\Release\libEmailSpartacus.pdb
+Z:\Github\Actualizacion\Consola\writeSetting\writeSetting\writeSetting\obj\Release\writeSetting.exe
+Z:\Github\Actualizacion\Consola\writeSetting\writeSetting\writeSetting\obj\Release\writeSetting.pdb

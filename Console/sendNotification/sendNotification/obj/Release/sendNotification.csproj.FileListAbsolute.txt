@@ -1,6 +1,3 @@
-Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\sendNotification.exe.config
-Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\sendNotification.exe
-Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\sendNotification.pdb
 Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\PushSharp.Android.dll
 Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\PushSharp.Apple.dll
 Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\PushSharp.Core.dll
@@ -9,6 +6,11 @@ Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\PushSharp.A
 Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\PushSharp.Apple.pdb
 Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\PushSharp.Core.pdb
 Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\Newtonsoft.Json.xml
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\sendNotificationAndroid.exe.config
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\sendNotificationAndroid.exe
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\sendNotificationAndroid.pdb
+Z:\Github\BBVA\Console\sendNotification\sendNotification\obj\Release\sendNotificationAndroid.exe
+Z:\Github\BBVA\Console\sendNotification\sendNotification\obj\Release\sendNotificationAndroid.pdb
 Z:\Github\BBVA\Console\sendNotification\sendNotification\obj\Release\sendNotification.csprojResolveAssemblyReference.cache
-Z:\Github\BBVA\Console\sendNotification\sendNotification\obj\Release\sendNotification.exe
-Z:\Github\BBVA\Console\sendNotification\sendNotification\obj\Release\sendNotification.pdb
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\libEmailSpartacus.dll
+Z:\Github\BBVA\Console\sendNotification\sendNotification\bin\Release\libEmailSpartacus.pdb

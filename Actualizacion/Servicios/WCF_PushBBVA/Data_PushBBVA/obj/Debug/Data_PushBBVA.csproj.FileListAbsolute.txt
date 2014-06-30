@@ -1,0 +1,21 @@
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Data_PushBBVA\bin\Debug\Data_PushBBVA.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Data_PushBBVA\bin\Debug\Data_PushBBVA.pdb
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Data_PushBBVA\obj\Debug\ResolveAssemblyReference.cache
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Data_PushBBVA\obj\Debug\Data_PushBBVA.dll
+Z:\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Data_PushBBVA\obj\Debug\Data_PushBBVA.pdb
+\\psf\Home\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Data_PushBBVA\bin\Debug\Data_PushBBVA.dll
+\\psf\Home\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Data_PushBBVA\bin\Debug\Data_PushBBVA.pdb
+\\psf\Home\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Data_PushBBVA\obj\Debug\Data_PushBBVA.dll
+\\psf\Home\Documents\Visual Studio 2010\Projects\WCF_PushBBVA\Data_PushBBVA\obj\Debug\Data_PushBBVA.pdb
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\Data_PushBBVA\bin\Debug\Data_PushBBVA.dll
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\Data_PushBBVA\bin\Debug\Data_PushBBVA.pdb
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\Data_PushBBVA\obj\Debug\Data_PushBBVA.dll
+Z:\Github\Notificacio\Notificaciones BBVA\Services\WCF_PushBBVA\Data_PushBBVA\obj\Debug\Data_PushBBVA.pdb
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Data_PushBBVA\bin\Debug\Data_PushBBVA.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Data_PushBBVA\bin\Debug\Data_PushBBVA.pdb
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Data_PushBBVA\obj\Debug\Data_PushBBVA.dll
+Z:\Github\NotificacionSmartbox\Notificaciones BBVA\Services\WCF_PushBBVA\Data_PushBBVA\obj\Debug\Data_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Data_PushBBVA\bin\Debug\Data_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Data_PushBBVA\bin\Debug\Data_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Data_PushBBVA\obj\Debug\Data_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Data_PushBBVA\obj\Debug\Data_PushBBVA.pdb

@@ -61,3 +61,15 @@ Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Data_PushBBVA.pdb
 Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\obj\Debug\WCF_PushBBVA.csprojResolveAssemblyReference.cache
 Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\obj\Debug\WCF_PushBBVA.dll
 Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\obj\Debug\WCF_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Npgsql.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Npgsql.xml
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\de\Npgsql.resources.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\es\Npgsql.resources.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\fi\Npgsql.resources.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\fr\Npgsql.resources.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\ja\Npgsql.resources.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\zh-CN\Npgsql.resources.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Android.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Apple.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\PushSharp.Core.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\WCF_PushBBVA\bin\Newtonsoft.Json.xml

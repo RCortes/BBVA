@@ -1,0 +1,8 @@
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Data_PushBBVA\bin\Release\Data_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Data_PushBBVA\bin\Release\Data_PushBBVA.pdb
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Data_PushBBVA\obj\Release\Data_PushBBVA.dll
+Z:\Github\BBVA\Servicios\WCF_PushBBVA\Data_PushBBVA\obj\Release\Data_PushBBVA.pdb
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\Data_PushBBVA\bin\Release\Data_PushBBVA.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\Data_PushBBVA\bin\Release\Data_PushBBVA.pdb
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\Data_PushBBVA\obj\Release\Data_PushBBVA.dll
+Z:\Github\Actualizacion\Servicios\WCF_PushBBVA\Data_PushBBVA\obj\Release\Data_PushBBVA.pdb
